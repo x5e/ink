@@ -1,0 +1,8 @@
+Dockerfile
+.gitignore
+CMakeCache.txt
+cmake-build-debug
+/build
+*.so
+*.o
+core
