@@ -43,8 +43,8 @@ int main_websocketpp() {
 
     try {
         // Set logging settings
-        echo_server.set_access_channels(websocketpp::log::alevel::all);
-        echo_server.clear_access_channels(websocketpp::log::alevel::frame_payload);
+        echo_server.set_access_channels(websocketpp::log::alevel::none);
+        // echo_server.clear_access_channels(websocketpp::log::alevel::frame_payload);
 
         // Initialize Asio
         echo_server.init_asio();
@@ -53,7 +53,7 @@ int main_websocketpp() {
         echo_server.set_message_handler(bind(&on_message,&echo_server,::_1,::_2));
 
         // Listen on port 9002
-        echo_server.listen(9002);
+        echo_server.listen(9003);
 
         // Start the server accept loop
         echo_server.start_accept();
@@ -62,9 +62,12 @@ int main_websocketpp() {
         echo_server.run();
     } catch (websocketpp::exception const & e) {
         std::cout << e.what() << std::endl;
+        return 1;
     } catch (...) {
         std::cout << "other exception" << std::endl;
+        return 2;
     }
+    return 0;
 }
 
 // websocat ws://localhost:9002/
