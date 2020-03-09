@@ -4,6 +4,7 @@
 #include <websocketpp/server.hpp>
 
 #include <iostream>
+#include <utility>
 
 typedef websocketpp::server<websocketpp::config::asio> server;
 
@@ -16,11 +17,11 @@ typedef server::message_ptr message_ptr;
 
 // Define a callback to handle incoming messages
 void on_message(server* s, websocketpp::connection_hdl hdl, message_ptr msg) {
-    /*
+
     std::cout << "on_message called with hdl: " << hdl.lock().get()
               << " and message: " << msg->get_payload()
               << std::endl;
-    */
+
 
     // check for a special command to instruct the server to stop listening so
     // it can be cleanly exited.
@@ -30,11 +31,12 @@ void on_message(server* s, websocketpp::connection_hdl hdl, message_ptr msg) {
     }
 
     try {
-        s->send(hdl, msg->get_payload(), msg->get_opcode());
+        s->send(std::move(hdl), msg->get_payload(), msg->get_opcode());
     } catch (websocketpp::exception const & e) {
         std::cout << "Echo failed because: "
                   << "(" << e.what() << ")" << std::endl;
     }
+
 }
 
 int main_websocketpp() {
