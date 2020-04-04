@@ -22,14 +22,6 @@ void on_message(server* s, websocketpp::connection_hdl hdl, message_ptr msg) {
               << " and message: " << msg->get_payload()
               << std::endl;
 
-
-    // check for a special command to instruct the server to stop listening so
-    // it can be cleanly exited.
-    if (msg->get_payload() == "stop-listening") {
-        s->stop_listening();
-        return;
-    }
-
     try {
         s->send(std::move(hdl), msg->get_payload(), msg->get_opcode());
     } catch (websocketpp::exception const & e) {
@@ -55,7 +47,7 @@ int main_websocketpp() {
         echo_server.set_message_handler(bind(&on_message,&echo_server,::_1,::_2));
 
         // Listen on port 9002
-        echo_server.listen(9003);
+        echo_server.listen(3980);
 
         // Start the server accept loop
         echo_server.start_accept();

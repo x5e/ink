@@ -30,5 +30,4 @@ namespace ink {
         uint64_t offs;
     } index_entry_t;
 
-
 }

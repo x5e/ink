@@ -12,5 +12,5 @@ RUN apt-get install -y libgtest-dev
 RUN mkdir -p /opt/x5e/ink
 WORKDIR /opt/x5e/ink
 COPY . .
-RUN cmake . && make && ./ink '--gtest_filter=muid.*:muid/*.*:*/muid.*/*:*/muid/*.*'
+RUN cmake . && make && ./ink '--gtest_filter=*'
 
