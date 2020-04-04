@@ -1,14 +1,17 @@
 #pragma once
+#include <sstream>
 
 namespace ink {
 
     class muid {
         uint8_t data[16] = {};
     public:
-        static muid copy_from(char *at) {
-            muid out;
-            memcpy(out.data, at, 16);
-            return out;
+        void copy_from(const char *at) {
+            memcpy(data, at, 16);
+        }
+
+        void zero() {
+            memset(data, 0, 16);
         }
 
         static muid parse(const std::string& hex_str) {

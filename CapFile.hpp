@@ -13,9 +13,6 @@ namespace ink {
             pcap_hdr_t pcap_hdr;
             out_.write((char*) &pcap_hdr, sizeof(pcap_hdr));
         }
-        void append(const std::string& msg) {
-            out_ << msg;
-            out_.flush();
-        }
+        void append(const std::string& msg);
     };
 }
