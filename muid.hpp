@@ -1,5 +1,6 @@
 #pragma once
 #include <sstream>
+#include <limits>
 
 namespace ink {
 
@@ -60,6 +61,16 @@ namespace ink {
                     (static_cast<uint64_t>(data[11]) << 12) +
                     (static_cast<uint64_t>(data[12]) << 4) +
                     (static_cast<uint64_t>(data[13]) >> 4);
+        }
+
+        uint64_t get_jell() const {
+            return get_wire() & std::numeric_limits<uint32_t>::max();
+        }
+
+        std::string get_jell_string() const {
+            std::stringstream stream;
+            stream << std::uppercase << std::setfill ('0') << std::setw(8) << std::hex << get_jell();
+            return "0x" + stream.str();
         }
 
         uint32_t get_angl() const {

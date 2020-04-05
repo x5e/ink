@@ -14,7 +14,7 @@ void ink::CapFile::append(const std::string& msg) {
     if (rows < 1)
         throw parse_error(__FILE__, __LINE__);
     trxn one(ptr);
-    std::cerr << "received: " << std::string(one.id_) << " " << std::string(one.story) << std::endl;
+    std::cerr << "received: " << std::string(one.id_) << " " << one.id_.get_jell_string() <<  std::endl;
     pcaprec_hdr_t record_header{};
     auto muts = one.id_.get_muts();
     record_header.ts_sec = muts / MILLION;

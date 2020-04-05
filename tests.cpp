@@ -1,5 +1,4 @@
 #include <gtest/gtest.h>
-#include "hdr_t.hpp"
 #include <iostream>
 #include "muid.hpp"
 
@@ -9,6 +8,8 @@ TEST(muid, parse) {
     EXPECT_EQ(an_id.get_wire(), 3749334650716167L);
     EXPECT_EQ(an_id.get_angl(), 327682);
     EXPECT_EQ(an_id.get_muts(), 1585510292133567L);
+    EXPECT_EQ(an_id.get_jell(), 7L);
+    EXPECT_EQ(an_id.get_jell_string(), "0x00000007");
     std::string eg2{an_id};
     EXPECT_EQ(eg2, eg);
     std::cerr << "okay! " << eg2 << std::endl;
