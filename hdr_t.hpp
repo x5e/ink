@@ -14,7 +14,7 @@ namespace ink {
         guint16 version_minor = 4;           // minor version number //
         gint32 thiszone = 0;                 // GMT to local correction //
         guint32 sigfigs = 0;                 // accuracy of timestamps //
-        guint32 snaplen = 0xFFFFFFFF;        // max length of captured packets, in octets //
+        guint32 snaplen = 0x7FFFFFFF;        // max length of captured packets, in octets //
         guint32 network = 147;               // data link type (private) //
     } pcap_hdr_t;
 
