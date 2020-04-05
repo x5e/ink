@@ -45,11 +45,11 @@ namespace ink {
         muid id_ = {};
     };
 
-    class trxn : public row {
+    class trxn_row : public row {
     public:
         muid story = {};
         muid acct = {};
-        explicit trxn(ccp &ptr) {
+        explicit trxn_row(ccp &ptr) {
             int count = parse_array_prefix(ptr);
             if (count < 3)
                 throw parse_error(__FILE__, __LINE__);

@@ -1,13 +1,18 @@
 #include <iostream>
-#include "CapFile.hpp"
+#include "storage.hpp"
 #include "contents.hpp"
 
 
-ink::CapFile::CapFile(const ink::muid &story) {
+ink::CapFile::CapFile(const ink::muid &story, const path& location) {
     story_ = story;
-    path_ = "pcaps/" + story_.get_jell_string() + "/" + std::string(story_);
-    ensure_containing_directory(path_);
-    handle_.open(path_.c_str(), std::ios_base::binary);
+    // TODO file lock, use location, etc.
+    // path_ = "./pcaps/" + story_.get_jell_string() + "/" + std::string(story_);
+    // ensure_containing_directory(path_);
+    path_ = std::string(story_);
+    std::cerr << "path=" << path_ << std::endl;
+    handle_ = std::fstream(path_.c_str(), std::ios_base::binary);
+    VERIFY(handle_.is_open());
+    VERIFY ( (handle_.rdstate() & std::ifstream::failbit ) == 0 );
     handle_.seekp(0, std::ios::end);
     if (handle_.tellp() == 0) {
         pcap_hdr_t pcap_hdr;
@@ -28,18 +33,7 @@ ink::CapFile::CapFile(const ink::muid &story) {
     VERIFY(handle_.tellg() == handle_.tellp());
 }
 
-
-void ink::CapFile::append(const std::string& msg) {
-    const char* ptr = msg.data();
-    if (*ptr++ != '\x92')
-        throw parse_error(__FILE__, __LINE__);
-    if (*ptr++ != '\x01')
-        throw parse_error(__FILE__, __LINE__);
-    int rows = parse_array_prefix(ptr);
-    if (rows < 1)
-        throw parse_error(__FILE__, __LINE__);
-    trxn one_row(ptr);
-    std::cerr << "received: " << std::string(one_row.id_) << " " << one_row.id_.get_jell_string() << std::endl;
+void ink::CapFile::receive(const std::string &msg, const trxn_row& one_row) {
     VERIFY(one_row.story == story_);
     if (not index_.empty()) {
         VERIFY(one_row.id_.get_muts() > index_.end()->first);
@@ -53,4 +47,21 @@ void ink::CapFile::append(const std::string& msg) {
     handle_.write((char*) &record_header, sizeof(record_header));
     handle_ << msg;
     handle_.flush();  // TODO figure out a way to close the file on exit.
+}
+
+void ink::FileSet::receive(const std::string& msg) {
+    const char* ptr = msg.data();
+    if (*ptr++ != '\x92')
+        throw parse_error(__FILE__, __LINE__);
+    if (*ptr++ != '\x01')
+        throw parse_error(__FILE__, __LINE__);
+    int rows = parse_array_prefix(ptr);
+    if (rows < 1)
+        throw parse_error(__FILE__, __LINE__);
+    trxn_row one_row(ptr);
+    std::cerr << "received: " << std::string(one_row.id_) << " " << one_row.id_.get_jell_string() << std::endl;
+    auto& ref = cap_files[one_row.story];
+    if (not ref)
+        ref = std::make_shared<CapFile>(one_row.story, directory_);
+    ref->receive(msg, one_row);
 }

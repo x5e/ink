@@ -21,11 +21,12 @@ void ink::ensure_containing_directory(const std::string &fn) {
     std::string command = "mkdir -p ";
     for (auto &part: parts) {
         if (not part.empty()) {
-            command += "/";
+            if (part != ".")
+                command += "/";
             command += part;
         }
     }
-    // std::cerr << "running: " << repr(command) << std::endl;
+    std::cerr << "running: " << command << std::endl;
     auto result = system(command.c_str());
     VERIFY(result != -1);
 }

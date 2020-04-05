@@ -2,7 +2,7 @@
 #include <websocketpp/config/asio_no_tls_client.hpp>
 #include <websocketpp/client.hpp>
 #include <iostream>
-#include "CapFile.hpp"
+#include "storage.hpp"
 
 typedef websocketpp::client<websocketpp::config::asio_client> Client;
 
@@ -13,7 +13,7 @@ using websocketpp::lib::bind;
 // pull out the type of messages sent by our config
 typedef websocketpp::config::asio_client::message_type::ptr message_ptr;
 
-ink::CapFile capFile;
+std::shared_ptr<ink::FileSet> fileSetPtr;
 
 void on_open(Client *c, websocketpp::connection_hdl hdl) {
     c->send(hdl, "\x92\x08\x80", websocketpp::frame::opcode::binary);
@@ -31,7 +31,8 @@ void on_message(Client *c, websocketpp::connection_hdl hdl, message_ptr msg) {
         std::cerr << "received header" << std::endl;
     } else if (payload[1] == '\x01') {
         std::cerr << "received transaction" << std::endl;
-        capFile.append(payload);
+        VERIFY(fileSetPtr);
+        fileSetPtr->receive(payload);
     } else {
         throw std::runtime_error("unexpected message");
     }
@@ -40,6 +41,7 @@ void on_message(Client *c, websocketpp::connection_hdl hdl, message_ptr msg) {
 void client_main(const std::string& uri = "ws://localhost:9002") {
     // Create a client endpoint
     Client client;
+    fileSetPtr = std::make_shared<ink::FileSet>(".");
 
     try {
 

@@ -93,5 +93,10 @@ namespace ink {
         bool operator==(const muid& other) const {
             return memcmp(data, other.data, sizeof(data)) == 0;
         }
+
+        bool operator<(muid const& right) const
+        {
+            return memcmp(data, right.data, sizeof(data)) < 0;
+        }
     };
 }
