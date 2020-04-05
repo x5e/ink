@@ -89,5 +89,9 @@ namespace ink {
             stream << std::uppercase << std::setfill ('0') << std::setw(5) << std::hex << get_angl();
             return stream.str();
         }
+
+        bool operator==(const muid& other) const {
+            return memcmp(data, other.data, sizeof(data)) == 0;
+        }
     };
 }
