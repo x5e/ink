@@ -16,7 +16,8 @@ namespace ink {
     using path = std::string;
 
     class CapFile {
-        std::fstream handle_;
+        std::ofstream output_;
+        std::ifstream innput_;
         muid story_;
         std::string path_;
         std::map<uint64_t, std::ios::pos_type> index_;
