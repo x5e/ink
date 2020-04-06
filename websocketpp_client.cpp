@@ -2,7 +2,7 @@
 #include <websocketpp/config/asio_no_tls_client.hpp>
 #include <websocketpp/client.hpp>
 #include <iostream>
-#include "storage.hpp"
+#include "CapFile.hpp"
 
 typedef websocketpp::client<websocketpp::config::asio_client> Client;
 

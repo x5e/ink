@@ -5,18 +5,18 @@
 namespace ink {
 
     class muid {
-        uint8_t data[16] = {};
+        uint8_t data_[16] = {};
     public:
         const char* bytes() const {
-            return (char*) data;
+            return (char*) data_;
         }
 
         void copy_from(const char *at) {
-            memcpy(data, at, 16);
+            memcpy(data_, at, 16);
         }
 
         void zero() {
-            memset(data, 0, 16);
+            memset(data_, 0, 16);
         }
 
         static muid parse(const std::string& hex_str) {
@@ -39,7 +39,7 @@ namespace ink {
                     value = value << 4;
                 }
                 size_t target = j >> 1;
-                out.data[target] =  static_cast<char>(value | out.data[target]);
+                out.data_[target] =  static_cast<char>(value | out.data_[target]);
                 j += 1;
             }
             return out;
@@ -47,24 +47,24 @@ namespace ink {
 
         uint64_t get_muts() const {
             return
-                    (static_cast<uint64_t>(data[0]) << 48) +
-                    (static_cast<uint64_t>(data[1]) << 40) +
-                    (static_cast<uint64_t>(data[2]) << 32) +
-                    (static_cast<uint64_t>(data[3]) << 24) +
-                    (static_cast<uint64_t>(data[4]) << 16) +
-                    (static_cast<uint64_t>(data[5]) << 8) +
-                    (static_cast<uint64_t>(data[6]));
+                    (static_cast<uint64_t>(data_[0]) << 48) +
+                    (static_cast<uint64_t>(data_[1]) << 40) +
+                    (static_cast<uint64_t>(data_[2]) << 32) +
+                    (static_cast<uint64_t>(data_[3]) << 24) +
+                    (static_cast<uint64_t>(data_[4]) << 16) +
+                    (static_cast<uint64_t>(data_[5]) << 8) +
+                    (static_cast<uint64_t>(data_[6]));
         }
 
         uint64_t get_wire() const {
             return
-                    (static_cast<uint64_t>(data[7]) << 44) +
-                    (static_cast<uint64_t>(data[8]) << 36) +
-                    (static_cast<uint64_t>(data[9]) << 28) +
-                    (static_cast<uint64_t>(data[10]) << 20) +
-                    (static_cast<uint64_t>(data[11]) << 12) +
-                    (static_cast<uint64_t>(data[12]) << 4) +
-                    (static_cast<uint64_t>(data[13]) >> 4);
+                    (static_cast<uint64_t>(data_[7]) << 44) +
+                    (static_cast<uint64_t>(data_[8]) << 36) +
+                    (static_cast<uint64_t>(data_[9]) << 28) +
+                    (static_cast<uint64_t>(data_[10]) << 20) +
+                    (static_cast<uint64_t>(data_[11]) << 12) +
+                    (static_cast<uint64_t>(data_[12]) << 4) +
+                    (static_cast<uint64_t>(data_[13]) >> 4);
         }
 
         uint64_t get_jell() const {
@@ -79,9 +79,9 @@ namespace ink {
 
         uint32_t get_angl() const {
             return
-                    ((static_cast<uint64_t>(data[13]) & 0x0F) << 16) +
-                    (static_cast<uint64_t>(data[14]) << 8) +
-                    static_cast<uint64_t>(data[15]);
+                    ((static_cast<uint64_t>(data_[13]) & 0x0F) << 16) +
+                    (static_cast<uint64_t>(data_[14]) << 8) +
+                    static_cast<uint64_t>(data_[15]);
         }
 
         explicit operator std::string() const {
@@ -95,12 +95,12 @@ namespace ink {
         }
 
         bool operator==(const muid& other) const {
-            return memcmp(data, other.data, sizeof(data)) == 0;
+            return memcmp(data_, other.data_, sizeof(data_)) == 0;
         }
 
         bool operator<(muid const& right) const
         {
-            return memcmp(data, right.data, sizeof(data)) < 0;
+            return memcmp(data_, right.data_, sizeof(data_)) < 0;
         }
     };
 }
