@@ -7,6 +7,10 @@ namespace ink {
     class muid {
         uint8_t data[16] = {};
     public:
+        const char* bytes() const {
+            return (char*) data;
+        }
+
         void copy_from(const char *at) {
             memcpy(data, at, 16);
         }

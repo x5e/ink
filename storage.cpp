@@ -68,3 +68,20 @@ void ink::FileSet::receive(const std::string& msg) {
         ref = std::make_shared<CapFile>(one_row.story, directory_);
     ref->receive(msg, one_row);
 }
+
+std::string ink::FileSet::greeting() const {
+    auto count = cap_files.size();
+    VERIFY(count < 65536);
+    std::stringstream stream;
+    stream << '\x92' << '\x08';
+    stream << '\xDE' << char(count >> 8) << char(count & 0xFF);
+    for (const auto& thing: cap_files) {
+        stream << '\xD8' << '\x01';
+        stream.write(thing.first.bytes(), 16);
+        auto gone_to = thing.second->goes_to();
+        for (int i=7;i>=0;i--) {
+            stream << char((gone_to >> (i*8)) & 0xFF);
+        }
+    }
+    return stream.str();
+}

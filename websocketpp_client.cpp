@@ -16,7 +16,7 @@ typedef websocketpp::config::asio_client::message_type::ptr message_ptr;
 std::shared_ptr<ink::FileSet> fileSetPtr;
 
 void on_open(Client *c, websocketpp::connection_hdl hdl) {
-    c->send(hdl, "\x92\x08\x80", websocketpp::frame::opcode::binary);
+    c->send(hdl, fileSetPtr->greeting(), websocketpp::frame::opcode::binary);
 }
 
 
@@ -28,7 +28,7 @@ void on_message(Client *c, websocketpp::connection_hdl hdl, message_ptr msg) {
     std::cout << "on_message called with hdl: " << hdl.lock().get()  << " and size: "
     << std::to_string(one_size) << " total: " << std::to_string(total_size) << std::endl;
     if (payload[1] == '\x08') {
-        std::cerr << "received header" << std::endl;
+        std::cerr << "received header" << ink::escapes(payload) <<  std::endl;
     } else if (payload[1] == '\x01') {
         std::cerr << "received transaction" << std::endl;
         VERIFY(fileSetPtr);

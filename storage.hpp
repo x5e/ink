@@ -25,6 +25,11 @@ namespace ink {
         CapFile(const muid &story, const path& location);
 
         void receive(const std::string &, const trxn_row&);
+
+        uint64_t goes_to() const {
+            VERIFY(not index_.empty());
+            return index_.end()->first;
+        }
     };
 
 
@@ -34,5 +39,6 @@ namespace ink {
     public:
         explicit FileSet(path loc): directory_(std::move(loc)) {}
         void receive(const std::string &msg);
+        std::string greeting() const;
     };
 }

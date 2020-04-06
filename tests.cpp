@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include <iostream>
 #include "muid.hpp"
+#include "misc.hpp"
 
 TEST(muid, parse) {
     std::string eg = "05A20361C016BF-D520000000007-50002";
@@ -13,4 +14,11 @@ TEST(muid, parse) {
     std::string eg2{an_id};
     EXPECT_EQ(eg2, eg);
     std::cerr << "okay! " << eg2 << std::endl;
+}
+
+TEST(misc, escapes) {
+    std::string eg = "\x5e\xde";
+    auto out = ink::escapes(eg);
+    std::cerr << out << std::endl;
+    EXPECT_EQ(out, "\\x5E\\xDE");
 }

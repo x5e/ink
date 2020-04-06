@@ -1,4 +1,6 @@
 #include "misc.hpp"
+#include <sstream>
+#define HEX(x) char(x < 10 ? x + '0' : x + 'A' - 10)
 
 std::vector<std::string> ink::split(const std::string &thing, const std::string &how) {
     std::vector<std::string> out;
@@ -29,4 +31,13 @@ void ink::ensure_containing_directory(const std::string &fn) {
     std::cerr << "running: " << command << std::endl;
     auto result = system(command.c_str());
     VERIFY(result != -1);
+}
+
+std::string ink::escapes(const std::string &from) {
+    std::stringstream stream;
+    for (char c : from) {
+        auto i = (uint8_t) c;
+        stream << '\\' << 'x' << HEX(i / 16) << HEX(i % 16);
+    }
+    return stream.str();
 }
