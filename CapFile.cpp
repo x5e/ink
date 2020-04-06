@@ -36,7 +36,7 @@ ink::CapFile::CapFile(const ink::muid &story, const path& directory) {
     VERIFY(innput_.tellg() == output_.tellp());
 }
 
-void ink::CapFile::receive(const std::string &msg, const trxn_row& one_row) {
+void ink::CapFile::receive(const std::string &msg, const TrxnRow& one_row) {
     VERIFY(one_row.story == story_);
     if (not index_.empty()) {
         VERIFY(one_row.id_.get_muts() > index_.end()->first);

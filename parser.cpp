@@ -31,7 +31,7 @@ void ink::parse_muid(ink::ccp &ptr, ink::muid &an_id) {
     ptr += 16;
 }
 
-ink::trxn_row::trxn_row(ink::ccp &ptr) {
+ink::TrxnRow::TrxnRow(ink::ccp &ptr) {
     int count = parse_array_prefix(ptr);
     if (count < 3)
         throw parse_error(__FILE__, __LINE__);

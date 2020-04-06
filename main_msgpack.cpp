@@ -25,7 +25,7 @@ int main_msgpack()
     msgpack::object deserialized = oh.get();
 
     // msgpack::object supports ostream.
-    std::cout << deserialized << std::endl;
+    std::cerr << deserialized << std::endl;
 
     // convert msgpack::object instance into the original type.
     // if the type is mismatched, it throws msgpack::type_error exception.

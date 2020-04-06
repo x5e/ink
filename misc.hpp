@@ -1,3 +1,4 @@
+#pragma once
 #include <string>
 #include <vector>
 #include "verify.hpp"
@@ -8,7 +9,7 @@ namespace ink {
     void ensure_containing_directory(const std::string &fn);
     std::string escapes(const std::string& from);
 
-    uint64_t flip64(uint64_t value) noexcept
+    inline uint64_t flip64(uint64_t value) noexcept
     {
         char* ptr = reinterpret_cast<char*>(&value);
         std::reverse(ptr, ptr + sizeof(uint64_t));

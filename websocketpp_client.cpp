@@ -3,6 +3,7 @@
 #include <websocketpp/client.hpp>
 #include <iostream>
 #include "CapFile.hpp"
+#include "FileSet.hpp"
 
 typedef websocketpp::client<websocketpp::config::asio_client> Client;
 
@@ -25,10 +26,12 @@ void on_message(Client *c, websocketpp::connection_hdl hdl, message_ptr msg) {
     auto one_size = payload.size();
     static auto total_size = 0;
     total_size += one_size;
-    std::cout << "on_message called with hdl: " << hdl.lock().get()  << " and size: "
+    std::cerr << "on_message called with hdl: " << hdl.lock().get()  << " and size: "
     << std::to_string(one_size) << " total: " << std::to_string(total_size) << std::endl;
     if (payload[1] == '\x08') {
-        std::cerr << "received header" << ink::escapes(payload) <<  std::endl;
+        std::cerr << "received header"
+        // << ink::escapes(payload)
+        <<  std::endl;
     } else if (payload[1] == '\x01') {
         std::cerr << "received transaction" << std::endl;
         VERIFY(fileSetPtr);
@@ -61,7 +64,7 @@ void client_main(const std::string& uri = "ws://localhost:9002") {
         websocketpp::lib::error_code ec;
         Client::connection_ptr con = client.get_connection(uri, ec);
         if (ec) {
-            std::cout << "could not create connection because: " << ec.message() << std::endl;
+            std::cerr << "could not create connection because: " << ec.message() << std::endl;
         }
 
         // Note that connect here only requests a connection. No network messages are
@@ -73,6 +76,6 @@ void client_main(const std::string& uri = "ws://localhost:9002") {
         // will exit when this connection is closed.
         client.run();
     } catch (websocketpp::exception const &e) {
-        std::cout << e.what() << std::endl;
+        std::cerr << e.what() << std::endl;
     }
 }

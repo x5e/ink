@@ -16,16 +16,16 @@ namespace ink {
 
     void parse_muid(ccp& ptr, muid& an_id);
 
-    class row {
+    class Row {
     public:
         muid id_ = {};
     };
 
-    class trxn_row : public row {
+    class TrxnRow : public Row {
     public:
         muid story = {};
         muid acct = {};
-        explicit trxn_row(ccp &ptr);
+        explicit TrxnRow(ccp &ptr);
     };
 
 }

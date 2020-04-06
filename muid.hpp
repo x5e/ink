@@ -1,6 +1,7 @@
 #pragma once
 #include <sstream>
 #include <limits>
+#include <iomanip>
 
 namespace ink {
 

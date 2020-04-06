@@ -24,11 +24,11 @@ namespace ink {
     public:
         CapFile(const muid &story, const path& directory);
 
-        void receive(const std::string &, const trxn_row&);
+        void receive(const std::string &, const TrxnRow&);
 
         uint64_t goes_to() const {
             VERIFY(not index_.empty());
-            return index_.end()->first;
+            return (--index_.end())->first;
         }
     };
 
