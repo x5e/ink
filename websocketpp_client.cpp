@@ -42,9 +42,8 @@ void on_message(Client *c, websocketpp::connection_hdl hdl, message_ptr msg) {
 }
 
 void client_main(const std::string& uri = "ws://localhost:9002") {
-    // Create a client endpoint
     Client client;
-    fileSetPtr = std::make_shared<ink::FileSet>(".");
+    fileSetPtr = std::make_shared<ink::FileSet>("./db.ink");
 
     try {
 

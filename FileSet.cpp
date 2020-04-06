@@ -24,22 +24,24 @@ void ink::FileSet::receive(const std::string& msg) {
     }
     ref->receive(msg, row);
     IndexEntry entry;
+    std::ios::pos_type start_entry;
+    muid& story = row.story;
     if (new_sequence) {
-        entry.set_story(row.story);
-        entry.set_value(row.id_.get_muts());
-        locations_[row.story] = output_.tellp();
-        output_.write((char*) &entry, sizeof(entry));
+        output_.seekp(0, output_.end);
+        start_entry = locations_[story] = output_.tellp();
+        entry.set_story(story);
     } else {
-        auto location = locations_[row.story];
-        innput_.seekg(location);
+        start_entry = locations_[row.story];
+        output_.seekp(start_entry);
+        innput_.seekg(start_entry);
         innput_.read((char*) &entry, sizeof(entry));
         VERIFY(entry.get_story() == row.story);
-        VERIFY(entry.get_value() <= row.id_.get_muts());
-        entry.set_value(row.id_.get_muts());
-        output_.seekp(location);
-        output_.write((char*) &entry, sizeof(entry));
+        VERIFY(entry.get_value() < row.id_.get_muts());
     }
+    entry.set_value(row.id_.get_muts());
+    output_.write((char*) &entry, sizeof(entry));
     output_.flush();
+    std::cerr << "wrote " + std::string(story) + " with value " << entry.get_value() << " to " << start_entry << std::endl;
 }
 
 std::string ink::FileSet::greeting() {
@@ -62,6 +64,7 @@ ink::FileSet::FileSet(ink::path directory) {
     else
         directory_ = directory;
     // TODO lock the contents file
+    ensure_directory(directory_);
     path index_path = directory_ + "contents.indx";
     output_.open(index_path.c_str(), std::ios_base::binary | std::ios_base::app | std::ios_base::ate);
     VERIFY(output_.is_open());
@@ -77,6 +80,7 @@ ink::FileSet::FileSet(ink::path directory) {
         cap_files[story] = std::make_shared<CapFile>(story, directory_);
         auto goes_to = cap_files[story]->goes_to();
         auto entry_value = entry.get_value();
+        std::cerr << "seen " << std::string(story) << " entry=" << entry.get_value() << " goes_to=" << goes_to << std::endl;
         VERIFY(goes_to == entry_value);
     }
 }

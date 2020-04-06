@@ -6,8 +6,9 @@
 ink::CapFile::CapFile(const ink::muid &story, const path& directory) {
     story_ = story;
     // TODO file lock, use location, etc.
-    path_ = "./pcaps/" + story_.get_jell_string() + "/" + std::string(story_);
-    ensure_containing_directory(path_);
+    path containing = directory + story_.get_jell_string() + "/";
+    ensure_directory(containing);
+    path_ = containing + std::string(story_);
     std::cerr << "path=" << path_ << std::endl;
     output_.open(path_.c_str(), std::ios_base::binary | std::ios_base::app | std::ios_base::ate);
     VERIFY(output_.is_open());
