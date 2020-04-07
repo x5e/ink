@@ -2,16 +2,30 @@
 // Created by Darin McGill on 4/6/20.
 //
 #include "parser.hpp"
+#include "misc.hpp"
 
-int ink::parse_array_prefix(ccp &ptr) {
-    int count;
+uint32_t ink::parse_array_prefix(ccp &ptr) {
+    uint32_t count = 0;
     if (((*ptr) & 0xF0) == 0x90) {
         count = (*ptr) & 0x0F;
         ptr += 1;
         return count;
     }
-    if ((*ptr) == '\xdc' or *ptr == '\xdd') {
-        throw std::runtime_error("not implemented");
+    if ((*ptr) == '\xdc') {
+        ptr += 1;
+        count += (uint8_t) *ptr;
+        ptr += 1;
+        count = count << 8;
+        count += (uint8_t) *ptr;
+        ptr += 1;
+        return count;
+    }
+    if ((*ptr) == '\xdd') {
+        ptr += 1;
+        uint32_t flipped = *((uint32_t*) ptr);
+        count = flip32(flipped);
+        ptr += 4;
+        return count;
     }
     throw std::runtime_error("unexpected");
 }

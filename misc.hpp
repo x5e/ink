@@ -18,6 +18,13 @@ namespace ink {
         return value;
     }
 
+    inline uint32_t flip32(uint32_t value) noexcept
+    {
+        char* ptr = reinterpret_cast<char*>(&value);
+        std::reverse(ptr, ptr + sizeof(uint32_t));
+        return value;
+    }
+
     inline void touch(const path& fn) {
         std::string command = std::string("touch ") + fn;
         auto result = system(command.c_str());

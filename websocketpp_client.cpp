@@ -33,7 +33,7 @@ void on_message(Client *c, websocketpp::connection_hdl hdl, message_ptr msg) {
         // << ink::escapes(payload)
         <<  std::endl;
     } else if (payload[1] == '\x01') {
-        std::cerr << "received transaction" << std::endl;
+        // std::cerr << "received transaction" << std::endl;
         VERIFY(fileSetPtr);
         fileSetPtr->receive(payload);
     } else {

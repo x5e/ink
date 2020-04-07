@@ -51,7 +51,7 @@ void ink::FileSet::receive(const std::string& msg) {
     if (rows < 1)
         throw parse_error(__FILE__, __LINE__);
     TrxnRow row(ptr);
-    std::cerr << "received: " << std::string(row.id_) << " " << row.id_.get_jell_string() << std::endl;
+    std::cerr << "received: " << std::string(row.id_) << std::endl;
     muid& story = row.story;
     uint64_t new_muts = row.id_.get_muts();
     auto& ref = cap_files[story];
@@ -74,7 +74,7 @@ void ink::FileSet::receive(const std::string& msg) {
     entry.set_value(new_muts);
     auto written = ::write(fd, &entry, sizeof(entry));
     VERIFY(written == sizeof(entry));
-    std::cerr << "wrote " + std::string(story) + " with value " << new_muts << " to " << index_offset << std::endl;
+    // std::cerr << "updated " + std::string(story) + " with value " << new_muts << " at " << index_offset << std::endl;
 }
 
 std::string ink::FileSet::greeting() {

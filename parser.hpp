@@ -12,7 +12,7 @@ namespace ink {
 
     using ccp = const char *;
 
-    int parse_array_prefix(ccp &ptr);
+    uint32_t parse_array_prefix(ccp &ptr);
 
     void parse_muid(ccp& ptr, muid& an_id);
 

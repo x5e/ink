@@ -22,7 +22,7 @@ namespace ink {
         }
 
         void set_story(muid story) {
-            memcpy(&data_[2], story.bytes(), 16);
+            memcpy(&data_[2], story.data(), 16);
         }
 
         muid get_story() const {

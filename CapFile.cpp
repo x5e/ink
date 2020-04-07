@@ -44,7 +44,7 @@ ink::CapFile::CapFile(const ink::muid &story, const path& directory, off_t index
 void ink::CapFile::receive(const std::string &msg, const TrxnRow& one_row) {
     VERIFY(one_row.story == story_);
     if (not index_.empty()) {
-        VERIFY(one_row.id_.get_muts() > index_.end()->first);
+        VERIFY(one_row.id_.get_muts() > (--index_.end())->first);
     }
     pcaprec_hdr_t record_header{};
     auto muts = one_row.id_.get_muts();
