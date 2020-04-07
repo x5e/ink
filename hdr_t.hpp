@@ -25,9 +25,5 @@ namespace ink {
         guint32 orig_len;       /* actual length of packet */
     } pcaprec_hdr_t;
 
-    typedef struct index_entry_s {
-        uint64_t muts;
-        uint64_t offs;
-    } index_entry_t;
 
 }

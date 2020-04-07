@@ -1,12 +1,8 @@
 #pragma once
 
-#include <fstream>
 #include <map>
-#include <utility>
 #include "hdr_t.hpp"
-#include "misc.hpp"
 #include "muid.hpp"
-#include "verify.hpp"
 #include "parser.hpp"
 
 #define MILLION 1000000
@@ -16,13 +12,13 @@ namespace ink {
     using path = std::string;
 
     class CapFile {
-        std::ofstream output_;
-        std::ifstream innput_;
+        int fd;
         muid story_;
         std::string path_;
         std::map<uint64_t, std::ios::pos_type> index_;
+        off_t index_offset_;
     public:
-        CapFile(const muid &story, const path& directory);
+        CapFile(const muid &story, const path& directory, off_t index_offset);
 
         void receive(const std::string &, const TrxnRow&);
 
@@ -30,6 +26,8 @@ namespace ink {
             VERIFY(not index_.empty());
             return (--index_.end())->first;
         }
+
+        off_t get_index_offset() const noexcept {return index_offset_;}
     };
 
 

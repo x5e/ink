@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <vector>
+#include <cstdlib>
 #include "verify.hpp"
 
 namespace ink {
@@ -15,6 +16,12 @@ namespace ink {
         char* ptr = reinterpret_cast<char*>(&value);
         std::reverse(ptr, ptr + sizeof(uint64_t));
         return value;
+    }
+
+    inline void touch(const path& fn) {
+        std::string command = std::string("touch ") + fn;
+        auto result = system(command.c_str());
+        VERIFY(result == 0);
     }
 
 }
