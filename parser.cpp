@@ -1,6 +1,3 @@
-//
-// Created by Darin McGill on 4/6/20.
-//
 #include "parser.hpp"
 #include "misc.hpp"
 

@@ -5,7 +5,7 @@
 #include "muid.hpp"
 #include "parser.hpp"
 
-#define MILLION 1000000
+#define MILLION 1'000'000
 
 
 namespace ink {
@@ -13,12 +13,12 @@ namespace ink {
 
     class CapFile {
         int fd;
-        muid story_;
-        std::string path_;
-        std::map<uint64_t, std::ios::pos_type> index_;
-        off_t index_offset_;
+        const muid story_;
+        const path containing_;
+        const path path_;
+        std::map<uint64_t, std::ios::pos_type> index_; // timestamp => position in file
     public:
-        CapFile(const muid &story, const path& directory, off_t index_offset);
+        CapFile(const muid &story, const path& directory);
 
         void receive(const std::string &, const TrxnRow&);
 
@@ -26,8 +26,6 @@ namespace ink {
             VERIFY(not index_.empty());
             return (--index_.end())->first;
         }
-
-        off_t get_index_offset() const noexcept {return index_offset_;}
     };
 
 

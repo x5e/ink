@@ -1,6 +1,3 @@
-//
-// Created by Darin McGill on 4/6/20.
-//
 
 #include <fcntl.h>
 #include <unistd.h>
@@ -30,9 +27,12 @@ ink::FileSet::FileSet(ink::path directory) {
         VERIFY(red == sizeof(entry));
         entry.validate();
         muid story = entry.get_story();
-        cap_files[story] = std::make_shared<CapFile>(story, directory_, location);
+        auto& val = cap_files[story];
+        VERIFY(val.first == 0 and val.second.get() == nullptr);
+        val.first = location;
+        val.second = std::make_shared<CapFile>(story, directory_);
         location += red;
-        auto goes_to = cap_files[story]->goes_to();
+        auto goes_to = val.second->goes_to();
         auto entry_value = entry.get_value();
         std::cerr << "seen " << std::string(story) << " entry=" << entry_value << " goes_to=" << goes_to << std::endl;
         VERIFY(goes_to == entry_value);
@@ -57,8 +57,8 @@ void ink::FileSet::receive(const std::string& msg) {
     auto& ref = cap_files[story];
     off_t index_offset;
     IndexEntry entry;
-    if (ref) {
-        index_offset = ref->get_index_offset();
+    if (ref.second) {
+        index_offset = ref.first;
         ::lseek(fd, index_offset, SEEK_SET);
         auto red = ::read(fd, &entry, sizeof(entry));
         VERIFY(red == sizeof(entry));
@@ -67,9 +67,10 @@ void ink::FileSet::receive(const std::string& msg) {
         ::lseek(fd, index_offset, SEEK_SET);
     } else {
         index_offset = ::lseek(fd, 0, SEEK_END);
-        ref = std::make_shared<CapFile>(row.story, directory_, index_offset);
+        ref.first = index_offset;
+        ref.second = std::make_shared<CapFile>(row.story, directory_);
     }
-    ref->receive(msg, row);
+    ref.second->receive(msg, row);
     entry.set_story(story);
     entry.set_value(new_muts);
     auto written = ::write(fd, &entry, sizeof(entry));

@@ -6,13 +6,14 @@
 #include "misc.hpp"
 
 
-ink::CapFile::CapFile(const ink::muid &story, const path& directory, off_t index_offset) {
-    index_offset_ = index_offset;
-    story_ = story;
+ink::CapFile::CapFile(const ink::muid &story, const path& directory):
+    story_(story),
+    containing_(directory + story_.get_jell_string() + "/"),
+    path_(containing_ + std::string(story_))
+{
     // TODO file lock, use location, etc.
-    path containing = directory + story_.get_jell_string() + "/";
-    ensure_directory(containing);
-    path_ = containing + std::string(story_);
+    VERIFY(*(--directory.end()) == '/');
+    ensure_directory(containing_);
     std::cerr << "opening CapFile with path=" << path_ << std::endl;
     touch(path_);
     fd = ::open(path_.c_str(), O_RDWR);
