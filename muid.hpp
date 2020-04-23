@@ -5,6 +5,8 @@
 
 namespace ink {
 
+    using muts_t = uint64_t;
+
     class muid {
         uint8_t data_[16] = {};
     public:

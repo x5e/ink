@@ -12,15 +12,17 @@ namespace ink {
     using path_t = std::string;
 
     class CapFile {
-        int fd;
         const path_t path_;
-        std::map<uint64_t, std::ios::pos_type> index_; // timestamp => position in file
+        const int fd;
+        off_t location;
+        size_t max_packet_size = 0;
+        std::map<muts_t, off_t> index_;
     public:
-        explicit CapFile(path_t  file_path);
+        explicit CapFile(path_t file_path);
 
-        void receive(const std::string &, const TrxnRow&);
+        void receive(const char*, size_t, muts_t);
 
-        uint64_t goes_to() const {
+        muts_t goes_to() const {
             VERIFY(not index_.empty());
             return (--index_.end())->first;
         }

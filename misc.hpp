@@ -25,10 +25,17 @@ namespace ink {
         return value;
     }
 
-    inline void touch(const path_t& fn) {
+    inline bool exists(const path_t & fn) {
+        using namespace std::string_literals;
+        std::string command = "/bin/test -e "s + fn;
+        auto result = system(command.c_str());
+        return (result == 0);
+    }
+
+    inline bool touch(const path_t& fn) {
         std::string command = std::string("touch ") + fn;
         auto result = system(command.c_str());
-        VERIFY(result == 0);
+        return(result == 0);
     }
 
 }
