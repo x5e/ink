@@ -8,12 +8,12 @@
 namespace ink {
 
     class FileSet {
-        path directory_;
+        path_t directory_;
         int fd;
         std::map<muid, std::pair<off_t, std::shared_ptr<CapFile>>> cap_files;
     public:
         // TODO put universe and/or account info in
-        explicit FileSet(path directory);
+        explicit FileSet(path_t directory);
 
         void receive(const std::string &msg);
 

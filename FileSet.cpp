@@ -6,14 +6,14 @@
 #include "IndexEntry.hpp"
 
 
-ink::FileSet::FileSet(ink::path directory) {
+ink::FileSet::FileSet(ink::path_t directory) {
     if (directory.back() != '/')
         directory_ = directory + "/";
     else
         directory_ = directory;
     // TODO lock the contents file
     ensure_directory(directory_);
-    path index_path = directory_ + "contents.indx";
+    path_t index_path = directory_ + "contents.indx";
     touch(index_path);
     fd = ::open(index_path.c_str(), O_RDWR);
     VERIFY(fd > 0);

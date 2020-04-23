@@ -5,7 +5,7 @@
 #include "verify.hpp"
 
 namespace ink {
-    using path = std::string;
+    using path_t = std::string;
     std::vector<std::string> split(const std::string &thing, const std::string &how);
     void ensure_containing_directory(const std::string &fn);
     void ensure_directory(const std::string &fn);
@@ -25,7 +25,7 @@ namespace ink {
         return value;
     }
 
-    inline void touch(const path& fn) {
+    inline void touch(const path_t& fn) {
         std::string command = std::string("touch ") + fn;
         auto result = system(command.c_str());
         VERIFY(result == 0);

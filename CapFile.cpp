@@ -1,4 +1,5 @@
 #include <iostream>
+#include <utility>
 #include <fcntl.h>
 #include <unistd.h>
 #include "CapFile.hpp"
@@ -6,14 +7,9 @@
 #include "misc.hpp"
 
 
-ink::CapFile::CapFile(const ink::muid &story, const path& directory):
-    story_(story),
-    containing_(directory + story_.get_jell_string() + "/"),
-    path_(containing_ + std::string(story_))
+ink::CapFile::CapFile(path_t file_path): path_(std::move(file_path))
 {
     // TODO file lock, use location, etc.
-    VERIFY(*(--directory.end()) == '/');
-    ensure_directory(containing_);
     std::cerr << "opening CapFile with path=" << path_ << std::endl;
     touch(path_);
     fd = ::open(path_.c_str(), O_RDWR);
@@ -43,9 +39,8 @@ ink::CapFile::CapFile(const ink::muid &story, const path& directory):
 }
 
 void ink::CapFile::receive(const std::string &msg, const TrxnRow& one_row) {
-    VERIFY(one_row.story == story_);
     if (not index_.empty()) {
-        VERIFY(one_row.id_.get_muts() > (--index_.end())->first);
+        VERIFY(one_row.id_.get_muts() >= (--index_.end())->first);
     }
     pcaprec_hdr_t record_header{};
     auto muts = one_row.id_.get_muts();

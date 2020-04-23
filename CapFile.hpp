@@ -9,16 +9,14 @@
 
 
 namespace ink {
-    using path = std::string;
+    using path_t = std::string;
 
     class CapFile {
         int fd;
-        const muid story_;
-        const path containing_;
-        const path path_;
+        const path_t path_;
         std::map<uint64_t, std::ios::pos_type> index_; // timestamp => position in file
     public:
-        CapFile(const muid &story, const path& directory);
+        explicit CapFile(path_t  file_path);
 
         void receive(const std::string &, const TrxnRow&);
 
