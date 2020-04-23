@@ -6,6 +6,7 @@
 namespace ink {
 
     using muts_t = uint64_t;
+    using ccp_t = const char *;
 
     class muid {
         uint8_t data_[16] = {};

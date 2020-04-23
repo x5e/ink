@@ -1,7 +1,7 @@
 #include "parser.hpp"
 #include "misc.hpp"
 
-uint32_t ink::parse_array_prefix(ccp &ptr) {
+uint32_t ink::parse_array_prefix(ccp_t &ptr) {
     uint32_t count = 0;
     if (((*ptr) & 0xF0) == 0x90) {
         count = (*ptr) & 0x0F;
@@ -27,7 +27,7 @@ uint32_t ink::parse_array_prefix(ccp &ptr) {
     throw std::runtime_error("unexpected");
 }
 
-void ink::parse_muid(ink::ccp &ptr, ink::muid &an_id) {
+void ink::parse_muid(ink::ccp_t &ptr, ink::muid &an_id) {
     char tag = *ptr++;
     if (tag == '\xc0') {
         an_id.zero();
@@ -42,7 +42,7 @@ void ink::parse_muid(ink::ccp &ptr, ink::muid &an_id) {
     ptr += 16;
 }
 
-ink::TrxnRow::TrxnRow(ink::ccp &ptr) {
+ink::TrxnRow::TrxnRow(ink::ccp_t &ptr) {
     int count = parse_array_prefix(ptr);
     if (count < 3)
         throw parse_error(__FILE__, __LINE__);
