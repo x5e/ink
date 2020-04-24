@@ -68,7 +68,7 @@ void ink::FileSet::receive(const char* ptr, size_t size) {
         ref.first = index_offset;
         ref.second = std::make_shared<CapFile>(get_location(story));
     }
-    ref.second->receive(msg, row);
+    ref.second->receive(ptr, size, new_muts);
     entry.set_story(story);
     entry.set_value(new_muts);
     auto written = ::write(index_fd_, &entry, sizeof(entry));

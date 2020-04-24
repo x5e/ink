@@ -39,7 +39,7 @@ ink::CapFile::CapFile(path_t file_path): path_(std::move(file_path)),
     }
 }
 
-void ink::CapFile::receive(const char* ptr, size_t size, muts_t muts) {
+void ink::CapFile::receive(const char* ptr, size_t size, ink::muts_t muts) {
     if (not index_.empty()) {
         VERIFY(muts >= (--index_.end())->first);
     }

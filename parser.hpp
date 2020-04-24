@@ -10,9 +10,9 @@ namespace ink {
         parse_error(const char *fn, int line) : std::runtime_error(std::string(fn) + std::to_string(line)) {}
     };
 
-    uint32_t parse_array_prefix(ccp_t &ptr);
+    uint32_t parse_array_prefix(cstr_t &ptr);
 
-    void parse_muid(ccp_t& ptr, muid& an_id);
+    void parse_muid(cstr_t& ptr, muid& an_id);
 
     class Row {
     public:
@@ -23,7 +23,7 @@ namespace ink {
     public:
         muid story = {};
         muid acct = {};
-        explicit TrxnRow(ccp_t &ptr);
+        explicit TrxnRow(cstr_t &ptr);
     };
 
 }

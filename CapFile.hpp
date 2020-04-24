@@ -4,6 +4,7 @@
 #include "hdr_t.hpp"
 #include "muid.hpp"
 #include "parser.hpp"
+#include "Message.hpp"
 
 #define MILLION 1'000'000
 
@@ -21,6 +22,8 @@ namespace ink {
         explicit CapFile(path_t file_path);
 
         void receive(const char*, size_t, muts_t);
+
+        std::iterator<std::input_iterator_tag, Message> begin() { throw std::runtime_error(path_); }
 
         muts_t goes_to() const {
             VERIFY(not index_.empty());

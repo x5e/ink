@@ -2,6 +2,8 @@
 #include <iostream>
 #include "muid.hpp"
 #include "misc.hpp"
+#include "Message.hpp"
+using namespace ink;
 
 TEST(muid, parse) {
     std::string eg = "05A20361C016BF-D520000000007-50002";
@@ -21,4 +23,10 @@ TEST(misc, escapes) {
     auto out = ink::escapes(eg);
     std::cerr << out << std::endl;
     EXPECT_EQ(out, "\\x5E\\xDE");
+}
+
+TEST(Message, ensure) {
+    Message message{1};
+    message.ensure(9);
+    EXPECT_EQ(message.allocated, 16);
 }
