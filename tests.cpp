@@ -1,13 +1,14 @@
 #include <gtest/gtest.h>
 #include <iostream>
-#include "muid.hpp"
+#include "Id.hpp"
 #include "misc.hpp"
 #include "Message.hpp"
 using namespace ink;
 
 TEST(muid, parse) {
     std::string eg = "05A20361C016BF-D520000000007-50002";
-    ink::muid an_id = ink::muid::parse(eg);
+    ink::Muid an_id;
+    an_id.parse(eg);
     EXPECT_EQ(an_id.get_wire(), 3749334650716167L);
     EXPECT_EQ(an_id.get_angl(), 327682);
     EXPECT_EQ(an_id.get_muts(), 1585510292133567L);

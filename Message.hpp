@@ -2,7 +2,7 @@
 #include <iterator>
 #include <tuple>
 #include <limits>
-#include "muid.hpp"
+#include "Id.hpp"
 
 namespace ink {
     class Message {

@@ -25,7 +25,7 @@ ink::FileSet::FileSet(ink::path_t directory):
         auto red = ::read(index_fd_, &entry, sizeof(entry));
         VERIFY(red == sizeof(entry));
         entry.validate();
-        muid story = entry.get_story();
+        Muid story = entry.get_story();
         auto& val = cap_files[story];
         VERIFY(val.first == 0 and val.second.get() == nullptr);
         val.first = location;
@@ -48,10 +48,10 @@ void ink::FileSet::receive(const char* ptr, size_t size) {
     int rows = parse_array_prefix(ptr);
     if (rows < 1)
         throw parse_error(__FILE__, __LINE__);
-    TrxnRow row(ptr);
-    std::cerr << "received: " << std::string(row.id_) << std::endl;
-    muid& story = row.story;
-    uint64_t new_muts = row.id_.get_muts();
+    auto trxn_row = std::dynamic_pointer_cast<TrxnRow>(parse_row(ptr));
+    std::cerr << "received: " << std::string(trxn_row->id_) << std::endl;
+    Muid& story = trxn_row->story;
+    uint64_t new_muts = trxn_row->id_.get_muts();
     auto& ref = cap_files[story];
     off_t index_offset;
     IndexEntry entry;

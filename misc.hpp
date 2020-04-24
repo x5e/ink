@@ -25,6 +25,14 @@ namespace ink {
         return value;
     }
 
+    template<typename T>
+    T flip(T value) noexcept
+    {
+        char* ptr = reinterpret_cast<char*>(&value);
+        std::reverse(ptr, ptr + sizeof(T));
+        return value;
+    }
+
     inline bool exists(const path_t & fn) {
         using namespace std::string_literals;
         std::string command = "/bin/test -e "s + fn;

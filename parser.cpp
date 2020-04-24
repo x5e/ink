@@ -27,11 +27,12 @@ uint32_t ink::parse_array_prefix(cstr_t &ptr) {
     throw std::runtime_error("unexpected");
 }
 
-void ink::parse_muid(ink::cstr_t &ptr, ink::muid &an_id) {
+ink::Muid ink::parse_muid(ink::cstr_t &ptr) {
+    Muid an_id;
     char tag = *ptr++;
     if (tag == '\xc0') {
         an_id.zero();
-        return;
+        return an_id;
     }
     if (tag != '\xd8')
         throw parse_error(__FILE__, __LINE__);
@@ -40,18 +41,47 @@ void ink::parse_muid(ink::cstr_t &ptr, ink::muid &an_id) {
         throw parse_error(__FILE__, __LINE__);
     an_id.copy_from(ptr);
     ptr += 16;
+    return an_id;
 }
 
-ink::TrxnRow::TrxnRow(ink::cstr_t &ptr) {
-    int count = parse_array_prefix(ptr);
-    if (count < 3)
-        throw parse_error(__FILE__, __LINE__);
-    char row_tag = *ptr++;
-    if (row_tag != '\x13')
-        throw parse_error(__FILE__, __LINE__);
-    parse_muid(ptr, id_);
-    parse_muid(ptr, story);
-    if (count >= 4) {
-        parse_muid(ptr, acct);
+int64_t ink::parse_bigint(ink::cstr_t &ptr) {
+    int64_t out;
+    switch (*(ptr++)) {
+        case '\xcf':
+        case '\xd3':
+            out = *reinterpret_cast<const int64_t*>(ptr);
+            ptr += 8;
+            return flip(out);
+        case '\xce':
+        case '\xd2':
+            auto four = *reinterpret_cast<const int32_t*>(ptr);
+            ptr += 4;
+            return flip(four);
     }
+    throw parse_error(__FILE__, __LINE__);
+}
+
+std::string ink::parse_string(ink::cstr_t &ptr) {
+    std::string out;
+    size_t bytes = -1;
+    auto tag = *reinterpret_cast<const uint8_t*>(ptr++);
+    if ((tag & 0b1110'0000) == 0b1010'0000) {
+        bytes = tag & 0b0001'1111;
+    }
+    if (tag == 0xd9 || tag == 0xc4) {
+        bytes = *reinterpret_cast<const uint8_t*>(ptr++);
+    }
+    if (bytes == -1) throw std::runtime_error("not implemented");
+    auto start_at = ptr;
+    ptr += bytes;
+    return std::string(start_at, bytes);
+}
+
+void ink::TrxnRow::parse(ink::cstr_t &ptr, uint32_t vals) {
+    id_ = parse_muid(ptr);
+    story = parse_muid(ptr);
+    if (vals >= 3) acct = parse_muid(ptr);
+    if (vals >= 4) actor = parse_muid(ptr);
+    if (vals >= 5) follows = parse_bigint(ptr);
+    if (vals >= 6) note = parse_string(ptr);
 }

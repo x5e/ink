@@ -1,7 +1,7 @@
-#include "muid.hpp"
+#include "Id.hpp"
+#include "verify.hpp"
 
-ink::muid ink::muid::parse(const std::string &hex_str) {
-    muid out;
+void ink::Id::parse(const std::string &hex_str) {
     size_t j = 0;
     for (char hex_digit : hex_str) {
         int value = 0;
@@ -20,13 +20,12 @@ ink::muid ink::muid::parse(const std::string &hex_str) {
             value = value << 4;
         }
         size_t target = j >> 1;
-        out.data_[target] =  static_cast<char>(value | out.data_[target]);
+        data_[target] =  static_cast<char>(value | data_[target]);
         j += 1;
     }
-    return out;
 }
 
-uint64_t ink::muid::get_muts() const {
+uint64_t ink::Muid::get_muts() const {
     return
             (static_cast<uint64_t>(data_[0]) << 48) +
             (static_cast<uint64_t>(data_[1]) << 40) +
@@ -37,7 +36,7 @@ uint64_t ink::muid::get_muts() const {
             (static_cast<uint64_t>(data_[6]));
 }
 
-uint64_t ink::muid::get_wire() const {
+uint64_t ink::Muid::get_wire() const {
     return
             (static_cast<uint64_t>(data_[7]) << 44) +
             (static_cast<uint64_t>(data_[8]) << 36) +
@@ -48,24 +47,24 @@ uint64_t ink::muid::get_wire() const {
             (static_cast<uint64_t>(data_[13]) >> 4);
 }
 
-uint64_t ink::muid::get_jell() const {
+uint64_t ink::Muid::get_jell() const {
     return get_wire() & std::numeric_limits<uint32_t>::max();
 }
 
-std::string ink::muid::get_jell_string() const {
+std::string ink::Muid::get_jell_string() const {
     std::stringstream stream;
     stream << std::uppercase << std::setfill ('0') << std::setw(8) << std::hex << get_jell();
     return "0x" + stream.str();
 }
 
-uint32_t ink::muid::get_angl() const {
+uint32_t ink::Muid::get_angl() const {
     return
             ((static_cast<uint64_t>(data_[13]) & 0x0F) << 16) +
             (static_cast<uint64_t>(data_[14]) << 8) +
             static_cast<uint64_t>(data_[15]);
 }
 
-ink::muid::operator std::string() const {
+ink::Muid::operator std::string() const {
     std::stringstream stream;
     stream << std::uppercase << std::setfill ('0') << std::setw(14) << std::hex << get_muts();
     stream << "-";
@@ -75,22 +74,35 @@ ink::muid::operator std::string() const {
     return stream.str();
 }
 
-bool ink::muid::operator==(const ink::muid &other) const {
+bool ink::Id::operator==(const ink::Id &other) const {
     return memcmp(data_, other.data_, sizeof(data_)) == 0;
 }
 
-bool ink::muid::operator<(const ink::muid &right) const {
+bool ink::Id::operator<(const ink::Id &right) const {
     return memcmp(data_, right.data_, sizeof(data_)) < 0;
 }
 
-void ink::muid::zero() {
+void ink::Id::zero() {
     memset(data_, 0, 16);
 }
 
-void ink::muid::copy_from(const char *at) {
+void ink::Id::copy_from(const char *at) {
     memcpy(data_, at, 16);
 }
 
-const char *ink::muid::data() const noexcept {
+const char *ink::Id::data() const noexcept {
     return (char*) data_;
+}
+
+ink::Uuid::operator std::string() const {
+    std::stringstream stream;
+    /*
+    stream << std::uppercase << std::setfill ('0') << std::setw(14) << std::hex << get_muts();
+    stream << "-";
+    stream << std::uppercase << std::setfill ('0') << std::setw(13) << std::hex << get_wire();
+    stream << "-";
+    stream << std::uppercase << std::setfill ('0') << std::setw(5) << std::hex << get_angl();
+     */
+    VERIFY(false);
+    return stream.str();
 }
