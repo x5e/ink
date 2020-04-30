@@ -77,3 +77,17 @@ std::string ink::parse_string(ink::cstr_t &ptr) {
     return std::string(start_at, bytes);
 }
 
+ink::Fancy<ink::Row> ink::parse_row(ink::cstr_t &ptr) {
+    int count = parse_array_prefix(ptr);
+    VERIFY(count >= 2);
+    auto row_tag = (tag_t) *ptr++;
+    switch (row_tag) {
+        case TrxnRow::Tag:
+            return make_fancy<TrxnRow>(ptr, count -1);
+        case PurgeRow::Tag:
+            return make_fancy<PurgeRow>(ptr, count -1);
+        default:
+            throw parse_error(__FILE__, __LINE__);
+    }
+}
+

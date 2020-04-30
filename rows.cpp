@@ -2,7 +2,7 @@
 #include "parser.hpp"
 
 
-void ink::TrxnRow::parse(ink::cstr_t &ptr, uint32_t vals) {
+ink::TrxnRow::TrxnRow(ink::cstr_t &ptr, uint32_t vals) {
     id_ = parse_muid(ptr);
     story = parse_muid(ptr);
     if (vals >= 3) account = parse_muid(ptr);

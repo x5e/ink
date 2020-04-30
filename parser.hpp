@@ -4,6 +4,7 @@
 #include <memory>
 #include "verify.hpp"
 #include "misc.hpp"
+#include "rows.hpp"
 
 namespace ink {
     class parse_error : public std::runtime_error {
@@ -17,25 +18,8 @@ namespace ink {
 
     int64_t parse_bigint(cstr_t& ptr);
 
-    std::string parse_string(cstr_t& ptr);
+    String parse_string(cstr_t& ptr);
 
-
-
-
-    std::shared_ptr<Row> parse_row(cstr_t& ptr) {
-        int count = parse_array_prefix(ptr);
-        VERIFY(count >= 2);
-        char row_tag = *ptr++;
-        std::shared_ptr<Row> out;
-        switch (row_tag) {
-            case '\x13':
-                out = std::make_shared<TrxnRow>();
-                break;
-            default:
-                throw parse_error(__FILE__, __LINE__);
-        }
-        out->parse(ptr, count - 1);
-        return out;
-    }
+    Fancy<Row> parse_row(cstr_t& ptr);
 
 }

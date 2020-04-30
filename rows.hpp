@@ -3,25 +3,24 @@
 
 namespace ink {
 
-    using tag_t = uint64_t;
-    using String = std::string;
-
     struct Row {
         tag_t tag = {};
         Muid id_ = {};
     };
 
     struct TrxnRow : public Row {
+        static const tag_t Tag = 0x13;
         Muid story = {};
         Muid account = {};
         Muid actor = {};
         Uuid request = {};
         muts_t follows = {};
         String note = {};
-        void parse(cstr_t &ptr, uint32_t vals);
+        TrxnRow(cstr_t &ptr, uint32_t vals);
     };
 
     struct PurgeRow: public Row {
+        static const tag_t Tag = 0x15;
         Muid account = {};  // TODO references accounts
         Muid row_id = {};
         void parse(cstr_t &ptr, uint32_t vals);

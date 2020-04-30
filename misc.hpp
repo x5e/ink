@@ -3,6 +3,7 @@
 #include <vector>
 #include <cstdlib>
 #include "verify.hpp"
+#include "Id.hpp"
 
 namespace ink {
     using path_t = std::string;
