@@ -19,19 +19,8 @@ namespace ink {
 
     std::string parse_string(cstr_t& ptr);
 
-    struct Row {
-        Muid id_ = {};
-        virtual void parse(cstr_t& ptr, uint32_t vals)= 0;
-    };
 
-    struct TrxnRow : public Row {
-        Muid story = {};
-        Muid acct = {};
-        Id actor = {};
-        muts_t follows = {};
-        std::string note = {};
-        void parse(cstr_t &ptr, uint32_t vals) override;
-    };
+
 
     std::shared_ptr<Row> parse_row(cstr_t& ptr) {
         int count = parse_array_prefix(ptr);

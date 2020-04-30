@@ -10,7 +10,7 @@ namespace ink {
 
     struct Id {
         uint8_t data_[16] = {};
-        void copy_from(const char *at);
+        void copy_from(cstr_t at);
         const char* data() const noexcept;
         bool operator==(const Id& other) const;
         bool operator<(Id const& right) const;

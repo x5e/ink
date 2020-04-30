@@ -77,11 +77,3 @@ std::string ink::parse_string(ink::cstr_t &ptr) {
     return std::string(start_at, bytes);
 }
 
-void ink::TrxnRow::parse(ink::cstr_t &ptr, uint32_t vals) {
-    id_ = parse_muid(ptr);
-    story = parse_muid(ptr);
-    if (vals >= 3) acct = parse_muid(ptr);
-    if (vals >= 4) actor = parse_muid(ptr);
-    if (vals >= 5) follows = parse_bigint(ptr);
-    if (vals >= 6) note = parse_string(ptr);
-}
