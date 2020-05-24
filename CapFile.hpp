@@ -1,33 +1,34 @@
 #pragma once
 
 #include <map>
-#include "hdr_t.hpp"
-#include "muid.hpp"
-#include "parser.hpp"
+#include "typedefs.hpp"
+#include "Id.hpp"
+#include "decoder.hpp"
+#include "Message.hpp"
 
-#define MILLION 1000000
+#define MILLION 1'000'000
 
 
 namespace ink {
-    using path = std::string;
+    using path_t = std::string;
 
     class CapFile {
-        int fd;
-        muid story_;
-        std::string path_;
-        std::map<uint64_t, std::ios::pos_type> index_;
-        off_t index_offset_;
+        const path_t path_;
+        const int fd;
+        off_t location;
+        size_t max_packet_size = 0;
+        std::map<muts_t, off_t> index_;
     public:
-        CapFile(const muid &story, const path& directory, off_t index_offset);
+        explicit CapFile(path_t file_path);
 
-        void receive(const std::string &, const TrxnRow&);
+        void receive(const char*, size_t, muts_t);
 
-        uint64_t goes_to() const {
+        std::iterator<std::input_iterator_tag, Message> begin() { throw std::runtime_error(path_); }
+
+        muts_t goes_to() const {
             VERIFY(not index_.empty());
             return (--index_.end())->first;
         }
-
-        off_t get_index_offset() const noexcept {return index_offset_;}
     };
 
 

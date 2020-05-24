@@ -1,7 +1,7 @@
 #pragma once
 
 #include "verify.hpp"
-#include "muid.hpp"
+#include "Id.hpp"
 #include "misc.hpp"
 
 namespace ink {
@@ -21,12 +21,12 @@ namespace ink {
             VERIFY(data_[2+16] == '\xCF');
         }
 
-        void set_story(muid story) {
+        void set_story(Muid story) {
             memcpy(&data_[2], story.data(), 16);
         }
 
-        muid get_story() const {
-            muid out;
+        Muid get_story() const {
+            Muid out;
             out.copy_from(&data_[2]);
             return out;
         }
