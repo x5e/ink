@@ -1,5 +1,6 @@
 #pragma once
 #include "Id.hpp"
+#include "String.hpp"
 
 namespace ink {
 
@@ -16,7 +17,7 @@ namespace ink {
         Uuid request = {};
         muts_t follows = {};
         String note = {};
-        TrxnRow(cstr_t &ptr, uint32_t vals);
+        void decode(cstr_t& ptr, uint32_t vals);
     };
 
     struct PurgeRow: public Row {

@@ -9,8 +9,9 @@ RUN apt-get install -y libmsgpack-dev
 RUN apt-get install -y libwebsocketpp-dev
 RUN apt-get install -y libasio-dev
 RUN apt-get install -y libgtest-dev
+RUN apt-get install -y libboost-all-dev
 RUN mkdir -p /opt/x5e/ink
 WORKDIR /opt/x5e/ink
 COPY . .
-RUN cmake . && make && ./ink '--gtest_filter=*'
+RUN cmake . && make -j 4 && ./ink.out '--gtest_filter=*'
 

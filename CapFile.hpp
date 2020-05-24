@@ -1,9 +1,9 @@
 #pragma once
 
 #include <map>
-#include "hdr_t.hpp"
+#include "typedefs.hpp"
 #include "Id.hpp"
-#include "parser.hpp"
+#include "decoder.hpp"
 #include "Message.hpp"
 
 #define MILLION 1'000'000

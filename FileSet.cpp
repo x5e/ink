@@ -1,18 +1,17 @@
-
 #include <fcntl.h>
 #include <unistd.h>
+#include <cstring>
 #include "FileSet.hpp"
 #include "misc.hpp"
 #include "IndexEntry.hpp"
 
 
-ink::FileSet::FileSet(ink::path_t directory):
-    directory_(directory.back() == '/' ? directory : directory + "/")
+ink::FileSet::FileSet(ink::path_t directory): directory_(std::move(directory))
 {
     using namespace std;
     // TODO lock the contents file
     ensure_directory(directory_);
-    path_t index_path = directory_ + "contents.indx";
+    path_t index_path = directory_ + "/contents.indx";
     touch(index_path);
     index_fd_ = ::open(index_path.c_str(), O_RDWR);
     VERIFY(index_fd_ > 0);
@@ -29,7 +28,7 @@ ink::FileSet::FileSet(ink::path_t directory):
         auto& val = cap_files[story];
         VERIFY(val.first == 0 and val.second.get() == nullptr);
         val.first = location;
-        val.second = make_shared<CapFile>(get_location(story));
+        val.second = make_unique<CapFile>(get_location(story));
         location += red;
         auto goes_to = val.second->goes_to();
         auto entry_value = entry.get_value();
@@ -40,18 +39,20 @@ ink::FileSet::FileSet(ink::path_t directory):
 }
 
 
-void ink::FileSet::receive(const char* ptr, size_t size) {
-    if (*ptr++ != '\x92')
-        throw parse_error(__FILE__, __LINE__);
-    if (*ptr++ != '\x01')
-        throw parse_error(__FILE__, __LINE__);
-    int rows = parse_array_prefix(ptr);
-    if (rows < 1)
-        throw parse_error(__FILE__, __LINE__);
-    auto trxn_row = std::dynamic_pointer_cast<TrxnRow>(parse_row(ptr));
-    std::cerr << "received: " << std::string(trxn_row->id_) << std::endl;
-    Muid& story = trxn_row->story;
-    uint64_t new_muts = trxn_row->id_.get_muts();
+void ink::FileSet::receive(cstr_t ptr, size_t size) {
+    DECODE_REQUIRE(*ptr++ == '\x92');
+    DECODE_REQUIRE(*ptr++ == '\x01');
+    auto row_count = decode_array_prefix(ptr);
+    DECODE_REQUIRE(row_count >= 1);
+    auto element_count = decode_array_prefix(ptr);
+    DECODE_REQUIRE(element_count >= 2);
+    auto row_tag = (tag_t) *ptr++;
+    DECODE_REQUIRE(row_tag == TrxnRow::Tag);
+    auto trxn_row = TrxnRow();
+    trxn_row.decode(ptr, element_count - 1);
+    std::cerr << "received: " << trxn_row.id_.to_string() << std::endl;
+    auto& story = trxn_row.story;
+    auto new_muts = trxn_row.id_.get_muts();
     auto& ref = cap_files[story];
     off_t index_offset;
     IndexEntry entry;
@@ -66,7 +67,7 @@ void ink::FileSet::receive(const char* ptr, size_t size) {
     } else {
         index_offset = ::lseek(index_fd_, 0, SEEK_END);
         ref.first = index_offset;
-        ref.second = std::make_shared<CapFile>(get_location(story));
+        ref.second = std::make_unique<CapFile>(get_location(story));
     }
     ref.second->receive(ptr, size, new_muts);
     entry.set_story(story);
@@ -92,5 +93,9 @@ std::string ink::FileSet::greeting() {
     stream.write(buffer, buffer_size);
     delete[] buffer;
     return stream.str();
+}
+
+ink::path_t ink::FileSet::get_location(ink::Muid story) {
+    return directory_ + "/", story.get_jell_string() + "/" + story.to_string();
 }
 
