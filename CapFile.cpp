@@ -3,7 +3,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include "CapFile.hpp"
-#include "decoder.hpp"
+#include "Message.hpp"
 #include "misc.hpp"
 
 
@@ -39,21 +39,22 @@ ink::CapFile::CapFile(path_t file_path): path_(std::move(file_path)),
     }
 }
 
-void ink::CapFile::receive(cstr_t ptr, size_t size, ink::muts_t muts) {
+void ink::CapFile::receive(Message& message) {
+    muts_t muts = message.getTrxn().id_.get_muts();
     if (not index_.empty()) {
         VERIFY(muts >= (--index_.end())->first);
     }
     pcaprec_hdr_t record_header{};
     record_header.ts_sec = muts / MILLION;
     record_header.ts_usec = muts % MILLION;
-    record_header.orig_len = size;
-    record_header.incl_len = size;
+    record_header.orig_len = message.size();
+    record_header.incl_len = message.size();
     index_[muts] = location;
     ssize_t written;
     location += written = ::write(fd, &record_header, sizeof(record_header));
     VERIFY(written == sizeof(record_header));
-    location += written = ::write(fd, ptr, size);
-    VERIFY(written == size);
-    if (size > max_packet_size)
-        max_packet_size = size;
+    location += written = ::write(fd, message.data(), message.size());
+    VERIFY(written == message.size());
+    if (message.size() > max_packet_size)
+        max_packet_size = message.size();
 }

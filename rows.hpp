@@ -1,22 +1,23 @@
 #pragma once
 #include "Id.hpp"
-#include "String.hpp"
+
 
 namespace ink {
 
     struct Row {
-        tag_t tag = {};
-        Muid id_ = {};
+        Id id_ = {};
     };
+
+    using String = std::string_view;
 
     struct TrxnRow : public Row {
         static const tag_t Tag = 0x13;
-        Muid story = {};
-        Muid account = {};
-        Muid actor = {};
-        Uuid request = {};
-        muts_t follows = {};
-        String note = {};
+        Id story_ = {};
+        Id account_ = {};
+        Id actor_ = {};
+        Id request_ = {};
+        muts_t follows_ = {};
+        String note_ = {};
     };
 
     /*

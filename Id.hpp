@@ -10,16 +10,22 @@ namespace ink {
     struct Id {
         uint8_t data_[16] = {};
 
+        Id() = default;
+
+        Id(const Id& other) {
+            copy_from(other.data());
+        }
+
         /**
          * Copies 16 bytes worth of data from the input arg.
          * @param at
          */
-        void copy_from(cstr_t at);
+        void copy_from(const char* at);
 
         /**
          * returns data as a c-string (const char*)
          */
-        cstr_t data() const noexcept;
+        const char* data() const noexcept;
 
         /**
          * Copies the bytes from other.
@@ -41,10 +47,6 @@ namespace ink {
          * @param hex_str
          */
         void parse(const std::string& hex_str);
-
-    };
-
-    struct Muid: public Id {
 
         /**
          * Treat the first seven bytes as a big-endian representation of time in micro seconds.
@@ -73,7 +75,6 @@ namespace ink {
         std::string to_string() const;
     };
 
-    struct Uuid: public Id {
-        std::string to_string() const;
-    };
+    using Muid = Id;
+
 }

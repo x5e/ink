@@ -3,14 +3,13 @@
 #include <map>
 #include "typedefs.hpp"
 #include "Id.hpp"
-#include "decoder.hpp"
 #include "Message.hpp"
+#include "verify.hpp"
 
 #define MILLION 1'000'000
 
 
 namespace ink {
-    using path_t = std::string;
 
     class CapFile {
         const path_t path_;
@@ -21,7 +20,7 @@ namespace ink {
     public:
         explicit CapFile(path_t file_path);
 
-        void receive(const char*, size_t, muts_t);
+        void receive(Message&);
 
         muts_t goes_to() const {
             VERIFY(not index_.empty());

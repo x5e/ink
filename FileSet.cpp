@@ -5,7 +5,7 @@
 #include "misc.hpp"
 #include "IndexEntry.hpp"
 #include "rows.hpp"
-#include "Window.hpp"
+#include "Message.hpp"
 
 ink::FileSet::FileSet(ink::path_t directory): directory_(std::move(directory))
 {
@@ -40,20 +40,10 @@ ink::FileSet::FileSet(ink::path_t directory): directory_(std::move(directory))
 }
 
 
-void ink::FileSet::receive(cstr_t ptr, size_t size) {
-    auto window = Window(ptr, size);
-    DECODE_REQUIRE(*ptr++ == '\x92');
-    DECODE_REQUIRE(*ptr++ == '\x01');
-    auto row_count = window.decode_array_prefix();
-    DECODE_REQUIRE(row_count >= 1);
-    auto element_count = window.decode_array_prefix();
-    DECODE_REQUIRE(element_count >= 2);
-    auto row_tag = (tag_t) *ptr++;
-    DECODE_REQUIRE(row_tag == TrxnRow::Tag);
-    auto trxn_row = TrxnRow();
-    trxn_row.decode(ptr, element_count - 1);
+void ink::FileSet::receive(Message& message) {
+    auto& trxn_row = message.getTrxn();
     std::cerr << "received: " << trxn_row.id_.to_string() << std::endl;
-    auto& story = trxn_row.story;
+    auto& story = trxn_row.story_;
     auto new_muts = trxn_row.id_.get_muts();
     auto& ref = cap_files[story];
     off_t index_offset;
@@ -71,7 +61,7 @@ void ink::FileSet::receive(cstr_t ptr, size_t size) {
         ref.first = index_offset;
         ref.second = std::make_unique<CapFile>(get_location(story));
     }
-    ref.second->receive(ptr, size, new_muts);
+    ref.second->receive(message);
     entry.set_story(story);
     entry.set_value(new_muts);
     auto written = ::write(index_fd_, &entry, sizeof(entry));
@@ -97,7 +87,7 @@ std::string ink::FileSet::greeting() {
     return stream.str();
 }
 
-ink::path_t ink::FileSet::get_location(ink::Muid story) {
+ink::path_t ink::FileSet::get_location(const ink::Muid& story) {
     return directory_ + "/", story.get_jell_string() + "/" + story.to_string();
 }
 

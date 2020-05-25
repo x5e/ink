@@ -1,7 +1,6 @@
 #include <gtest/gtest.h>
 #include "Id.hpp"
 #include "verify.hpp"
-#include "decoder.hpp"
 
 void ink::Id::parse(const std::string &hex_str) {
     size_t j = 0;
@@ -28,7 +27,7 @@ void ink::Id::parse(const std::string &hex_str) {
 }
 
 
-uint64_t ink::Muid::get_muts() const {
+uint64_t ink::Id::get_muts() const {
     return
             (static_cast<uint64_t>(data_[0]) << 48) +
             (static_cast<uint64_t>(data_[1]) << 40) +
@@ -39,7 +38,7 @@ uint64_t ink::Muid::get_muts() const {
             (static_cast<uint64_t>(data_[6]));
 }
 
-uint64_t ink::Muid::get_wire() const {
+uint64_t ink::Id::get_wire() const {
     return
             (static_cast<uint64_t>(data_[7]) << 44) +
             (static_cast<uint64_t>(data_[8]) << 36) +
@@ -50,24 +49,24 @@ uint64_t ink::Muid::get_wire() const {
             (static_cast<uint64_t>(data_[13]) >> 4);
 }
 
-uint64_t ink::Muid::get_jell() const {
+uint64_t ink::Id::get_jell() const {
     return get_wire() & std::numeric_limits<uint32_t>::max();
 }
 
-std::string ink::Muid::get_jell_string() const {
+std::string ink::Id::get_jell_string() const {
     std::stringstream stream;
     stream << std::uppercase << std::setfill('0') << std::setw(8) << std::hex << get_jell();
     return "0x" + stream.str();
 }
 
-uint32_t ink::Muid::get_angl() const {
+uint32_t ink::Id::get_angl() const {
     return
             ((static_cast<uint64_t>(data_[13]) & 0x0F) << 16) +
             (static_cast<uint64_t>(data_[14]) << 8) +
             static_cast<uint64_t>(data_[15]);
 }
 
-std::string ink::Muid::to_string() const {
+std::string ink::Id::to_string() const {
     std::stringstream stream;
     stream << std::uppercase << std::setfill('0') << std::setw(14) << std::hex << get_muts();
     stream << "-";
@@ -97,24 +96,12 @@ const char *ink::Id::data() const noexcept {
     return (char *) data_;
 }
 
-std::string ink::Uuid::to_string() const {
-    std::stringstream stream;
-    /*
-    stream << std::uppercase << std::setfill ('0') << std::setw(14) << std::hex << get_muts();
-    stream << "-";
-    stream << std::uppercase << std::setfill ('0') << std::setw(13) << std::hex << get_wire();
-    stream << "-";
-    stream << std::uppercase << std::setfill ('0') << std::setw(5) << std::hex << get_angl();
-     */
-    VERIFY(false);
-    return stream.str();
-}
 
 
 TEST(Id, parse) {
     using namespace ink;
     std::string eg = "05A20361C016BF-D520000000007-50002";
-    ink::Muid an_id;
+    ink::Id an_id;
     an_id.parse(eg);
     EXPECT_EQ(an_id.get_wire(), 3749334650716167L);
     EXPECT_EQ(an_id.get_angl(), 327682);

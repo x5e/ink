@@ -4,6 +4,8 @@
 #include <iostream>
 #include "CapFile.hpp"
 #include "FileSet.hpp"
+#include "verify.hpp"
+#include "Message.hpp"
 
 typedef websocketpp::client<websocketpp::config::asio_client> Client;
 
@@ -25,6 +27,7 @@ void on_message(Client *c, websocketpp::connection_hdl hdl, message_ptr msg) {
     auto payload = msg->get_payload();
     auto one_size = payload.size();
     static auto total_size = 0;
+    static ink::Message decoder;
     total_size += one_size;
     std::cerr << "on_message called with hdl: " << hdl.lock().get()  << " and size: "
     << std::to_string(one_size) << " total: " << std::to_string(total_size) << std::endl;
@@ -35,7 +38,8 @@ void on_message(Client *c, websocketpp::connection_hdl hdl, message_ptr msg) {
     } else if (payload[1] == '\x01') {
         // std::cerr << "received transaction" << std::endl;
         VERIFY(fileSetPtr);
-        fileSetPtr->receive(payload.c_str(), payload.size());
+        decoder = std::string_view(payload);
+        fileSetPtr->receive(decoder);
     } else {
         throw std::runtime_error("unexpected message");
     }

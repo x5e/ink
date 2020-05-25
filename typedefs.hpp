@@ -26,7 +26,6 @@ namespace ink {
     } pcaprec_hdr_t;
 
     using muts_t = uint64_t;
-    using cstr_t = const char *;
-    using buff_t = char *;
     using tag_t = uint64_t;
+    using path_t = std::string;
 }
