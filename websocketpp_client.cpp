@@ -27,7 +27,7 @@ void on_message(Client *c, websocketpp::connection_hdl hdl, message_ptr msg) {
     auto payload = msg->get_payload();
     auto one_size = payload.size();
     static auto total_size = 0;
-    static ink::Message decoder;
+    auto message = ink::Message(payload);
     total_size += one_size;
     std::cerr << "on_message called with hdl: " << hdl.lock().get()  << " and size: "
     << std::to_string(one_size) << " total: " << std::to_string(total_size) << std::endl;
@@ -38,8 +38,7 @@ void on_message(Client *c, websocketpp::connection_hdl hdl, message_ptr msg) {
     } else if (payload[1] == '\x01') {
         // std::cerr << "received transaction" << std::endl;
         VERIFY(fileSetPtr);
-        decoder = std::string_view(payload);
-        fileSetPtr->receive(decoder);
+        fileSetPtr->receive(message);
     } else {
         throw std::runtime_error("unexpected message");
     }

@@ -90,7 +90,7 @@ int64_t ink::Message::decode_bigint() {
 }
 
 
-std::string_view ink::Message::decode_string() {
+ink::Span ink::Message::decode_string() {
     size_t count = -1;
     auto tag = *reinterpret_cast<const uint8_t *>(cursor_++);
     if ((tag & 0b1110'0000) == 0b1010'0000) {
@@ -103,7 +103,7 @@ std::string_view ink::Message::decode_string() {
         throw std::runtime_error("not implemented");
     auto start_at = cursor_;
     cursor_ += count;
-    return std::string_view(start_at, count);
+    return {start_at, count};
 }
 
 
@@ -115,29 +115,6 @@ void ink::Message::_decode() {
     rowCount_ = decode_array_prefix();
     DECODE_REQUIRE(rowCount_ >= 1);
     trxnRow_ = decode_trxn();
-    DECODE_REQUIRE(cursor_ <= view_.end());
+    DECODE_REQUIRE(cursor_ <= end());
     decoded_ = true;
 }
-
-
-
-/*
-void ink::parse_row(ink::cstr_t &ptr, buff_t dest, size_t size) {
-    int count = decode_array_prefix(ptr);
-    VERIFY(count >= 2);
-    auto row_tag = (tag_t) *ptr++;
-    switch (row_tag) {
-        case TrxnRow::Tag:
-            assert(size >= sizeof(TrxnRow));
-            reinterpret_cast<TrxnRow *>(dest)->decode(ptr, count - 1);
-            break;
-        case PurgeRow::Tag:
-            assert(size >= sizeof(PurgeRow));
-            auto prgRow = reinterpret_cast<PurgeRow*>(dest);
-            prgRow->parse(ptr, count -1);
-            return;
-        default:
-            throw DecodeError(__FILE__, __LINE__);
-    }
-}
-*/

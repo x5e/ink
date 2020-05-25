@@ -2,17 +2,16 @@
 
 #include <memory>
 #include <string>
-#include <string_view>
 #include <cstddef>
 #include "Id.hpp"
 #include "typedefs.hpp"
 #include "rows.hpp"
+#include "Span.hpp"
 
 
 namespace ink {
 
-    class Message {
-        std::string_view view_;
+    class Message: public Span {
         const char *cursor_ = nullptr;
         TrxnRow trxnRow_ = {};
         int64_t msgType_ = 0;
@@ -27,7 +26,7 @@ namespace ink {
 
         Id decode_id();
 
-        std::string_view decode_string();
+        Span decode_string();
 
         TrxnRow decode_trxn();
 
@@ -36,18 +35,8 @@ namespace ink {
             if (not decoded_) _decode();
             return trxnRow_;
         }
+        explicit Message(const std::string& str): Span(str) {}
 
-        Message() = default;
-
-        Message &operator=(const std::string_view &view) {
-            view_ = view;
-            decoded_ = false;
-            return *this;
-        }
-
-        size_t size() const { return view_.size(); }
-
-        const char *data() const { return view_.data(); }
 
         class DecodeError : public std::runtime_error {
         public:
