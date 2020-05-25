@@ -4,7 +4,8 @@
 #include "FileSet.hpp"
 #include "misc.hpp"
 #include "IndexEntry.hpp"
-
+#include "rows.hpp"
+#include "Window.hpp"
 
 ink::FileSet::FileSet(ink::path_t directory): directory_(std::move(directory))
 {
@@ -40,11 +41,12 @@ ink::FileSet::FileSet(ink::path_t directory): directory_(std::move(directory))
 
 
 void ink::FileSet::receive(cstr_t ptr, size_t size) {
+    auto window = Window(ptr, size);
     DECODE_REQUIRE(*ptr++ == '\x92');
     DECODE_REQUIRE(*ptr++ == '\x01');
-    auto row_count = decode_array_prefix(ptr);
+    auto row_count = window.decode_array_prefix();
     DECODE_REQUIRE(row_count >= 1);
-    auto element_count = decode_array_prefix(ptr);
+    auto element_count = window.decode_array_prefix();
     DECODE_REQUIRE(element_count >= 2);
     auto row_tag = (tag_t) *ptr++;
     DECODE_REQUIRE(row_tag == TrxnRow::Tag);

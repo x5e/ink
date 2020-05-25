@@ -11,6 +11,7 @@ void ink::TrxnRow::decode(ink::cstr_t &ptr, uint32_t vals) {
     if (vals >= 6) note.decode(ptr);
 }
 
+/*
 void ink::PurgeRow::parse(ink::cstr_t &ptr, uint32_t vals) {
     id_.decode(ptr);
     if (vals >= 2) account.decode(ptr);
@@ -41,3 +42,4 @@ void ink::PopRow::parse(ink::cstr_t &ptr, uint32_t ) {
     id_.decode(ptr);
     throw std::runtime_error("not implemented");
 }
+*/

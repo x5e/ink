@@ -42,7 +42,6 @@ namespace ink {
          */
         void parse(const std::string& hex_str);
 
-        void decode(cstr_t& ptr);
     };
 
     struct Muid: public Id {

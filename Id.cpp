@@ -28,19 +28,6 @@ void ink::Id::parse(const std::string &hex_str) {
 }
 
 
-void ink::Id::decode(ink::cstr_t &ptr) {
-    char tag = *ptr++;
-    if (tag == '\xc0') {
-        zero();
-    } else {
-        DECODE_REQUIRE(tag == '\xd8');
-        char kind = *ptr++;
-        DECODE_REQUIRE(kind == '\x01');
-        copy_from(ptr);
-        ptr += 16;
-    }
-}
-
 uint64_t ink::Muid::get_muts() const {
     return
             (static_cast<uint64_t>(data_[0]) << 48) +

@@ -17,9 +17,9 @@ namespace ink {
         Uuid request = {};
         muts_t follows = {};
         String note = {};
-        void decode(cstr_t& ptr, uint32_t vals);
     };
 
+    /*
     struct PurgeRow: public Row {
         static const tag_t Tag = 0x15;
         Muid account = {};  // TODO references accounts
@@ -67,4 +67,5 @@ namespace ink {
         // null entry to indicate deletion of branch
         void parse(cstr_t &ptr, uint32_t vals);
     };
+     */
 }

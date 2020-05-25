@@ -1,8 +1,18 @@
 #include <cassert>
 #include "decoder.hpp"
 #include "misc.hpp"
+#include "Window.hpp"
+#define DECODE_REQUIRE(x) if (not (x)) throw ::ink::DecodeError(__FILE__, __LINE__)
 
-uint32_t ink::decode_array_prefix(cstr_t &ptr) {
+namespace ink {
+    class DecodeError : public std::runtime_error {
+    public:
+        DecodeError(const char *fn, int line) : std::runtime_error(std::string(fn) + std::to_string(line)) {}
+    };
+}
+
+uint32_t ink::Window::decode_array_prefix() {
+    auto& ptr = start_;
     uint32_t count = 0;
     if (((*ptr) & 0xF0) == 0x90) {
         count = (*ptr) & 0x0F;
@@ -29,7 +39,22 @@ uint32_t ink::decode_array_prefix(cstr_t &ptr) {
 }
 
 
-int64_t ink::decode_bigint(ink::cstr_t &ptr) {
+void ink::Window::decode_id(Id& id) {
+    auto& ptr = start_;
+    char tag = *ptr++;
+    if (tag == '\xc0') {
+        id.zero();
+    } else {
+        DECODE_REQUIRE(tag == '\xd8');
+        char kind = *ptr++;
+        DECODE_REQUIRE(kind == '\x01');
+        id.copy_from(ptr);
+        ptr += 16;
+    }
+}
+
+int64_t ink::Window::decode_bigint() {
+    auto& ptr = start_;
     int64_t out;
     switch (*(ptr++)) {
         case '\xcf':
