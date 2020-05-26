@@ -1,3 +1,4 @@
+#include <cassert>
 #include "Message.hpp"
 #include "misc.hpp"
 
@@ -103,7 +104,9 @@ ink::Span ink::Message::decode_string() {
         throw std::runtime_error("not implemented");
     auto start_at = cursor_;
     cursor_ += count;
-    return {start_at, count};
+    auto out = Span(start_at, count);
+    assert(out.data() != nullptr);
+    return out;
 }
 
 

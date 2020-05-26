@@ -1,6 +1,8 @@
 #pragma once
+#include <string_view>
 
 namespace ink {
+    /*
     class Span {
         const char* ptr_ = nullptr;
         std::size_t size_ = 0;
@@ -12,4 +14,6 @@ namespace ink {
         const char* data() const { return ptr_; }
         const char* end() const { return ptr_ + size_; }
     };
+     */
+    using Span = std::string_view;
 }
