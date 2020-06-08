@@ -37,7 +37,7 @@ void on_message(Client *c, websocketpp::connection_hdl hdl, message_ptr msg) {
         <<  std::endl;
     } else if (payload[1] == '\x01') {
         // std::cerr << "received transaction" << std::endl;
-        VERIFY(fileSetPtr);
+        REQUIRE(fileSetPtr);
         fileSetPtr->receive(message);
     } else {
         throw std::runtime_error("unexpected message");

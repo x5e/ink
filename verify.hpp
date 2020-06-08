@@ -3,18 +3,14 @@
 #include <string>
 #include <cerrno>
 #include <iostream>
-// This checks for unexpected input.  UNLIKE NORMAL ASSERTIONS, THIS SHOULD REMAIN ACTIVE IN PRODUCTION
-#define VERIFY(x) if (not (x)) throw ink::VerificationFailure(#x, __FILE__, __LINE__)
-
+#include "typedefs.hpp"
+#define REQUIRE(x) if (not (x)) return ink::barf(#x, __FILE__, __LINE__)
+#define PROPAGATE(x) do {ink::error_t retval = (x); if (retval) {return retval;}} while (0)
 
 namespace ink {
-
-    class VerificationFailure : public std::runtime_error {
-    public:
-        explicit VerificationFailure(const char* expr, const char* file, int line)
-        : std::runtime_error(std::string(expr) + " in " + file + " at line " + std::to_string(line) ) {
-            std::cerr << this->what() << std::endl;
-        }
-    };
-
+    error_t barf(const char* expr, const char* filename, int line) {
+        static std::string x;
+        x = std::string(expr) + " " + filename + " " + std::to_string(line);
+        return x.c_str();
+    }
 }

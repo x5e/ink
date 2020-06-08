@@ -23,7 +23,7 @@ namespace ink {
         void receive(Message&);
 
         muts_t goes_to() const {
-            VERIFY(not index_.empty());
+            REQUIRE(not index_.empty());
             return (--index_.end())->first;
         }
     };

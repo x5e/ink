@@ -1,6 +1,6 @@
 #pragma once
 #include "Id.hpp"
-#include "Span.hpp"
+#include "Strings.hpp"
 #include <string>
 
 
@@ -10,8 +10,6 @@ namespace ink {
         Id id_ = {};
     };
 
-    using String = std::string;
-
     struct TrxnRow : public Row {
         static const tag_t Tag = 0x13;
         Id story_ = {};
@@ -19,7 +17,7 @@ namespace ink {
         Id actor_ = {};
         Id request_ = {};
         muts_t follows_ = {};
-        Span note_ = {};
+        Stretch note_ = {};
     };
 
     /*

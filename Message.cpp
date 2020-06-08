@@ -1,34 +1,35 @@
 #include <cassert>
 #include "Message.hpp"
 #include "misc.hpp"
+#include "verify.hpp"
 
-#define DECODE_REQUIRE(x) if (not (x)) throw ::ink::Message::DecodeError(__FILE__, __LINE__)
 using Byte = char;
 
-ink::TrxnRow ink::Message::decode_trxn() {
-    auto trxnRow = TrxnRow{};
-    auto fields = decode_array_prefix();
-    DECODE_REQUIRE(fields >= 3);
-    auto tag = decode_bigint();
-    DECODE_REQUIRE(tag == 0x13);
-    trxnRow.id_ = decode_id();
-    trxnRow.story_ = decode_id();
+ink::error_t ink::Message::decode_trxn(ink::TrxnRow& trxnRow) {
+    int fields;
+    PROPAGATE(decode_array_prefix(fields));
+    REQUIRE(fields >= 3);
+    bigint tag;
+    PROPAGATE(decode_bigint(tag));
+    REQUIRE(tag == 0x13);
+    PROPAGATE(decode_id(trxnRow.id_));
+    PROPAGATE(decode_id(trxnRow.story_));
 
-    if (fields >= 4) trxnRow.account_ = decode_id();
-    if (fields >= 5) trxnRow.actor_ = decode_id();
-    if (fields >= 6) trxnRow.follows_ = decode_bigint();
-    if (fields >= 7) trxnRow.note_ = decode_string();
+    if (fields >= 4) PROPAGATE(decode_id(trxnRow.account_));
+    if (fields >= 5) PROPAGATE(decode_id(trxnRow.actor_));
+    if (fields >= 6) PROPAGATE(decode_bigint(trxnRow.follows_));
+    if (fields >= 7) PROPAGATE(decode_string(trxnRow.note_));
 
-    return trxnRow;
+    return no_error;
 }
 
 
-uint32_t ink::Message::decode_array_prefix() {
+ink::error_t ink::Message::decode_array_prefix(int& out) {
     uint32_t count = 0;
     if (((*cursor_) & Byte(0xF0)) == Byte(0x90)) {
-        auto aByte = ((*cursor_) & Byte(0x0F));
+        out = ((*cursor_) & Byte(0x0F));
         cursor_ += 1;
-        return aByte;
+        return no_error;
     }
     if ((*cursor_) == Byte(0xdc)) {
         cursor_ += 1;
@@ -36,62 +37,66 @@ uint32_t ink::Message::decode_array_prefix() {
         cursor_ += 1;
         count = count << 8;
         count += (uint8_t) *cursor_;
+        out = count;
         cursor_ += 1;
-        return count;
+        return no_error;
     }
     if ((*cursor_) == Byte(0xdd)) {
         cursor_ += 1;
         uint32_t flipped = *((uint32_t *) cursor_);
         count = flip32(flipped);
+        out = count;
         cursor_ += 4;
-        return count;
+        return no_error;
     }
-    throw DecodeError(__FILE__, __LINE__);
+    REQUIRE(false);
 }
 
 
-ink::Id ink::Message::decode_id() {
-    Id id;
+ink::error_t ink::Message::decode_id(ink::Id& id) {
     auto &ptr = cursor_;
     Byte tag = *ptr++;
     if (tag == Byte(0xc0)) {
         id.zero();
     } else {
-        DECODE_REQUIRE(tag == Byte(0xd8));
+        REQUIRE(tag == Byte(0xd8));
         Byte kind = *ptr++;
-        DECODE_REQUIRE(kind == Byte(0x01));
+        REQUIRE(kind == Byte(0x01));
         id.copy_from((char *) ptr);
         ptr += 16;
     }
-    return id;
+    return no_error;
 }
 
-int64_t ink::Message::decode_bigint() {
+ink::error_t ink::Message::decode_bigint(int64_t& out) {
     // auto& ptr = cursor_;
     int64_t eight;
     uint32_t four;
     auto thing = *(cursor_++);
     if ((thing & 0x80) == 0) {
-        return thing;
+        out = thing;
+        return no_error;
     }
     switch (thing) {
         case Byte(0xcf):
         case Byte(0xd3):
             eight = *reinterpret_cast<const int64_t *>(cursor_);
             cursor_ += 8;
-            return flip64(eight);
+            out= flip64(eight);
+            return no_error;
         case Byte('\xce'):
         case Byte('\xd2'):
             four = *reinterpret_cast<const int32_t *>(cursor_);
             cursor_ += 4;
-            return flip32(four);
+            out = flip32(four);
+            return no_error;
         default:
-            throw DecodeError(__FILE__, __LINE__);
+            REQUIRE(false);
     }
 }
 
 
-ink::Span ink::Message::decode_string() {
+ink::error_t ink::Message::decode_string(ink::Stretch& out) {
     size_t count = -1;
     auto tag = *reinterpret_cast<const uint8_t *>(cursor_++);
     if ((tag & 0b1110'0000) == 0b1010'0000) {
@@ -100,24 +105,25 @@ ink::Span ink::Message::decode_string() {
     if (tag == 0xd9 || tag == 0xc4) {
         count = *reinterpret_cast<const uint8_t *>(cursor_++);
     }
-    if (count == -1)
-        throw std::runtime_error("not implemented");
+    REQUIRE(count != -1);
     auto start_at = cursor_;
     cursor_ += count;
-    auto out = Span(start_at, count);
-    assert(out.data() != nullptr);
-    return out;
+    out = Stretch(start_at, count);
+    return no_error;
 }
 
 
-void ink::Message::_decode() {
-    auto prefix = decode_array_prefix();
-    DECODE_REQUIRE(prefix == 2);
-    msgType_ = decode_bigint();
-    DECODE_REQUIRE(msgType_ == 1);
-    rowCount_ = decode_array_prefix();
-    DECODE_REQUIRE(rowCount_ >= 1);
-    trxnRow_ = decode_trxn();
-    DECODE_REQUIRE(cursor_ <= end());
+ink::error_t ink::Message::_decode() {
+    cursor_ = begin();
+    int prefix;
+    PROPAGATE(decode_array_prefix(prefix));
+    REQUIRE(prefix == 2);
+    PROPAGATE(decode_bigint(msgType_));
+    REQUIRE(msgType_ == 1);
+    PROPAGATE(decode_array_prefix(rowCount_));
+    REQUIRE(rowCount_ >= 1);
+    PROPAGATE(decode_trxn(trxnRow_));
+    REQUIRE(cursor_ <= end());
     decoded_ = true;
+    return no_error;
 }

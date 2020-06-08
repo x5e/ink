@@ -6,42 +6,37 @@
 #include "Id.hpp"
 #include "typedefs.hpp"
 #include "rows.hpp"
-#include "Span.hpp"
+#include "Strings.hpp"
 
 
 namespace ink {
 
-    class Message: public Span {
+    class Message: public Stretch {
         const char *cursor_ = nullptr;
         TrxnRow trxnRow_ = {};
-        int64_t msgType_ = 0;
-        uint32_t rowCount_ = 0;
+        bigint msgType_ = 0;
+        int rowCount_ = 0;
         bool decoded_ = false;
 
-        void _decode();
+        error_t _decode();
 
-        uint32_t decode_array_prefix();
+        error_t decode_array_prefix(int&);
 
-        int64_t decode_bigint();
+        error_t decode_bigint(bigint&);
 
-        Id decode_id();
+        error_t decode_id(Id&);
 
-        Span decode_string();
+        error_t decode_string(Stretch&);
 
-        TrxnRow decode_trxn();
+        error_t decode_trxn(TrxnRow&);
 
     public:
         const TrxnRow &getTrxn() {
             if (not decoded_) _decode();
             return trxnRow_;
         }
-        explicit Message(const std::string& str): Span(str) {}
+        explicit Message(const std::string& str): Stretch(str) {}
 
-
-        class DecodeError : public std::runtime_error {
-        public:
-            DecodeError(const char *fn, int line) : std::runtime_error(std::string(fn) + " " + std::to_string(line)) {}
-        };
 
     };
 

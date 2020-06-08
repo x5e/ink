@@ -1,5 +1,6 @@
 #pragma once
-#include <string_view>
+// #include <string_view>
+#include <boost/utility/string_ref.hpp>
 
 namespace ink {
     /*
@@ -15,5 +16,6 @@ namespace ink {
         const char* end() const { return ptr_ + size_; }
     };
      */
-    using Span = std::string_view;
+    // using Span = std::string_view;
+    using Stretch = boost::string_ref;
 }

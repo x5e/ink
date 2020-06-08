@@ -33,7 +33,7 @@ void ink::ensure_directory(const std::string &fn) {
     std::string command = "mkdir -p " + fn;
     std::cerr << "running: " << command << std::endl;
     auto result = system(command.c_str());
-    VERIFY(result != -1);
+    REQUIRE(result != -1);
 }
 
 std::string ink::escapes(const std::string &from) {
