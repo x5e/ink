@@ -7,11 +7,12 @@
 #include "misc.hpp"
 
 
-ink::CapFile::CapFile(path_t file_path): path_(std::move(file_path)),
-    fd(exists(path_) || touch(path_) ? ::open(path_.c_str(), O_RDWR) : 0)
+ink::error_t ink::CapFile::open(path_t file_path)
 {
+    path_ = std::move(file_path);
     // TODO file lock, use location, etc.
     std::cerr << "opening CapFile with path=" << path_ << std::endl;
+    fd = exists(path_) || touch(path_) ? ::open(path_.c_str(), O_RDWR) : 0;
     REQUIRE(fd > 0);
     off_t initial_size = ::lseek(fd, 0, SEEK_END);
     if (initial_size == 0) {
@@ -37,9 +38,10 @@ ink::CapFile::CapFile(path_t file_path): path_(std::move(file_path)),
         }
         REQUIRE(location == initial_size);
     }
+    return no_error;
 }
 
-void ink::CapFile::receive(Message& message) {
+ink::error_t ink::CapFile::receive(Message& message) {
     muts_t muts = message.getTrxn().id_.get_muts();
     if (not index_.empty()) {
         REQUIRE(muts >= (--index_.end())->first);
@@ -57,4 +59,5 @@ void ink::CapFile::receive(Message& message) {
     REQUIRE(written == message.size());
     if (message.size() > max_packet_size)
         max_packet_size = message.size();
+    return no_error;
 }

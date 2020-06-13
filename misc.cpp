@@ -29,7 +29,7 @@ TEST(misc, split) {
     EXPECT_EQ(out[2], "baz");
 }
 
-void ink::ensure_directory(const std::string &fn) {
+ink::error_t ink::ensure_directory(const std::string &fn) {
     std::string command = "mkdir -p " + fn;
     std::cerr << "running: " << command << std::endl;
     auto result = system(command.c_str());

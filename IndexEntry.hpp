@@ -19,6 +19,7 @@ namespace ink {
             REQUIRE(data_[0] == '\xd8');
             REQUIRE(data_[1] == '\x01');
             REQUIRE(data_[2 + 16] == '\xCF');
+            return no_error;
         }
 
         void set_story(Muid story) {

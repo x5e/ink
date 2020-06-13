@@ -1,10 +1,11 @@
 #pragma once
 #include <string>
 #include <vector>
+#include "typedefs.hpp"
 
 namespace ink {
     std::vector<std::string> split(const std::string &thing, const std::string &how);
-    void ensure_directory(const std::string &fn);
+    error_t ensure_directory(const std::string &fn);
     std::string escapes(const std::string& from);
     bool exists(const std::string & fn);
     bool touch(const std::string& fn);

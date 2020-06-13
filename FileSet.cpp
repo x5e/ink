@@ -7,9 +7,10 @@
 #include "rows.hpp"
 #include "Message.hpp"
 
-ink::FileSet::FileSet(ink::path_t directory): directory_(std::move(directory))
+ink::error_t ink::FileSet::open(ink::path_t directory)
 {
     using namespace std;
+    directory_ = std::move(directory);
     // TODO lock the contents file
     ensure_directory(directory_);
     path_t index_path = directory_ + "/contents.indx";
@@ -29,18 +30,23 @@ ink::FileSet::FileSet(ink::path_t directory): directory_(std::move(directory))
         auto& val = cap_files[story];
         REQUIRE(val.first == 0 and val.second.get() == nullptr);
         val.first = location;
-        val.second = make_unique<CapFile>(get_location(story));
+        val.second = make_unique<CapFile>();
+        PROPAGATE(val.second->open(get_location(story)));
         location += red;
-        auto goes_to = val.second->goes_to();
+        muts_t goes_to;
+        PROPAGATE(val.second->goes_to(goes_to));
         auto entry_value = entry.get_value();
         // cerr << "seen " << string(story) << " entry=" << entry_value << " goes_to=" << goes_to << endl;
         REQUIRE(goes_to == entry_value);
     }
     REQUIRE(location == initial_size);
+    opened = true;
+    return no_error;
 }
 
 
-void ink::FileSet::receive(Message& message) {
+ink::error_t ink::FileSet::receive(Message& message) {
+    REQUIRE(opened);
     auto& trxn_row = message.getTrxn();
     std::cerr << "received: " << trxn_row.id_.to_string() << std::endl;
     auto& story = trxn_row.story_;
@@ -66,10 +72,11 @@ void ink::FileSet::receive(Message& message) {
     entry.set_value(new_muts);
     auto written = ::write(index_fd_, &entry, sizeof(entry));
     REQUIRE(written == sizeof(entry));
+    return no_error;
     // std::cerr << "updated " + std::string(story) + " with value " << new_muts << " at " << index_offset << std::endl;
 }
 
-std::string ink::FileSet::greeting() {
+ink::error_t ink::FileSet::greeting(std::string& out) {
     auto count = cap_files.size();
     REQUIRE(count < 65536);
     std::stringstream stream;
@@ -84,7 +91,8 @@ std::string ink::FileSet::greeting() {
     REQUIRE(red == buffer_size);
     stream.write(buffer, buffer_size);
     delete[] buffer;
-    return stream.str();
+    out = stream.str();
+    return no_error;
 }
 
 ink::path_t ink::FileSet::get_location(const ink::Muid& story) {
