@@ -5,7 +5,7 @@
 #include "CapFile.hpp"
 #include "FileSet.hpp"
 #include "verify.hpp"
-#include "Message.hpp"
+#include "Decoder.hpp"
 
 typedef websocketpp::client<websocketpp::config::asio_client> Client;
 

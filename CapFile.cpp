@@ -3,9 +3,10 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include "CapFile.hpp"
-#include "Message.hpp"
+#include "Decoder.hpp"
 #include "misc.hpp"
 
+#define MILLION 1'000'000
 
 ink::error_t ink::CapFile::open(path_t file_path)
 {
@@ -41,8 +42,7 @@ ink::error_t ink::CapFile::open(path_t file_path)
     return no_error;
 }
 
-ink::error_t ink::CapFile::receive(Message& message) {
-    muts_t muts = message.getTrxn().id_.get_muts();
+ink::error_t ink::CapFile::receive(Stretch message, muts_t muts) {
     if (not index_.empty()) {
         REQUIRE(muts >= (--index_.end())->first);
     }
@@ -52,7 +52,7 @@ ink::error_t ink::CapFile::receive(Message& message) {
     record_header.orig_len = message.size();
     record_header.incl_len = message.size();
     index_[muts] = location;
-    ssize_t written;
+    ssize_t written=0;
     location += written = ::write(fd, &record_header, sizeof(record_header));
     REQUIRE(written == sizeof(record_header));
     location += written = ::write(fd, message.data(), message.size());

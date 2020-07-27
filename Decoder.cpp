@@ -1,30 +1,30 @@
 #include <cassert>
-#include "Message.hpp"
+#include "Decoder.hpp"
 #include "misc.hpp"
 #include "verify.hpp"
 
 using Byte = char;
 
-ink::error_t ink::Message::decode_trxn(ink::TrxnRow& trxnRow) {
-    int fields;
+ink::error_t ink::Decoder::decode_meta(ink::MetaRow& metaRow) {
+    int fields=0;
     PROPAGATE(decode_array_prefix(fields));
     REQUIRE(fields >= 3);
-    bigint tag;
-    PROPAGATE(decode_bigint(tag));
-    REQUIRE(tag == 0x13);
-    PROPAGATE(decode_id(trxnRow.id_));
-    PROPAGATE(decode_id(trxnRow.story_));
+    PROPAGATE(decode_bigint(metaRow.tag));
+    REQUIRE(metaRow.tag == 0x13);
+    PROPAGATE(decode_id(metaRow.id_));
+    PROPAGATE(decode_id(metaRow.story_));
 
-    if (fields >= 4) PROPAGATE(decode_id(trxnRow.account_));
-    if (fields >= 5) PROPAGATE(decode_id(trxnRow.actor_));
-    if (fields >= 6) PROPAGATE(decode_bigint(trxnRow.follows_));
-    if (fields >= 7) PROPAGATE(decode_string(trxnRow.note_));
+    if (fields >= 4) PROPAGATE(decode_id(metaRow.account_));
+    if (fields >= 5) PROPAGATE(decode_id(metaRow.actor_));
+    if (fields >= 6) PROPAGATE(decode_id(metaRow.request_));
+    if (fields >= 7) PROPAGATE(decode_bigint(metaRow.follows_));
+    if (fields >= 8) PROPAGATE(decode_string(metaRow.note_));
 
     return no_error;
 }
 
 
-ink::error_t ink::Message::decode_array_prefix(int& out) {
+ink::error_t ink::Decoder::decode_array_prefix(int& out) {
     uint32_t count = 0;
     if (((*cursor_) & Byte(0xF0)) == Byte(0x90)) {
         out = ((*cursor_) & Byte(0x0F));
@@ -53,7 +53,7 @@ ink::error_t ink::Message::decode_array_prefix(int& out) {
 }
 
 
-ink::error_t ink::Message::decode_id(ink::Id& id) {
+ink::error_t ink::Decoder::decode_id(ink::Id& id) {
     auto &ptr = cursor_;
     Byte tag = *ptr++;
     if (tag == Byte(0xc0)) {
@@ -68,13 +68,13 @@ ink::error_t ink::Message::decode_id(ink::Id& id) {
     return no_error;
 }
 
-ink::error_t ink::Message::decode_bigint(int64_t& out) {
+ink::error_t ink::Decoder::decode_bigint(int64_t& out) {
     // auto& ptr = cursor_;
-    int64_t eight;
-    uint32_t four;
+    int64_t eight = 0;
+    uint32_t four = 0;
     auto thing = *(cursor_++);
     if ((thing & 0x80) == 0) {
-        out = thing;
+        out = (int) thing;
         return no_error;
     }
     switch (thing) {
@@ -96,7 +96,7 @@ ink::error_t ink::Message::decode_bigint(int64_t& out) {
 }
 
 
-ink::error_t ink::Message::decode_string(ink::Stretch& out) {
+ink::error_t ink::Decoder::decode_string(ink::Stretch& out) {
     size_t count = -1;
     auto tag = *reinterpret_cast<const uint8_t *>(cursor_++);
     if ((tag & 0b1110'0000) == 0b1010'0000) {
@@ -106,24 +106,24 @@ ink::error_t ink::Message::decode_string(ink::Stretch& out) {
         count = *reinterpret_cast<const uint8_t *>(cursor_++);
     }
     REQUIRE(count != -1);
-    auto start_at = cursor_;
+    const auto *start_at = cursor_;
     cursor_ += count;
     out = Stretch(start_at, count);
     return no_error;
 }
 
 
-ink::error_t ink::Message::_decode() {
+ink::error_t ink::Decoder::decode_message(bigint& msgType, int& rowCount) {
     cursor_ = begin();
-    int prefix;
+    int prefix = 0;
     PROPAGATE(decode_array_prefix(prefix));
     REQUIRE(prefix == 2);
-    PROPAGATE(decode_bigint(msgType_));
-    REQUIRE(msgType_ == 1);
-    PROPAGATE(decode_array_prefix(rowCount_));
-    REQUIRE(rowCount_ >= 1);
-    PROPAGATE(decode_trxn(trxnRow_));
-    REQUIRE(cursor_ <= end());
-    decoded_ = true;
-    return no_error;
+    PROPAGATE(decode_bigint(msgType));
+    if (msgType == 1) {
+        PROPAGATE(decode_array_prefix(rowCount));
+        REQUIRE(rowCount >= 1);
+        REQUIRE(cursor_ < end());
+        return no_error;
+    }
+    REQUIRE(false);
 }

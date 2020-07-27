@@ -18,7 +18,7 @@ namespace ink {
         // TODO put universe and/or account info in
         error_t open(path_t directory);
 
-        error_t receive(Message &);
+        error_t receive(Stretch);
 
         error_t greeting(std::string&);
     };

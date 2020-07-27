@@ -7,10 +7,11 @@
 namespace ink {
 
     struct Row {
+        tag_t tag = 0;
         Id id_ = {};
     };
 
-    struct TrxnRow : public Row {
+    struct MetaRow : public Row {
         static const tag_t Tag = 0x13;
         Id story_ = {};
         Id account_ = {};

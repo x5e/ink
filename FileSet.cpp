@@ -5,7 +5,7 @@
 #include "misc.hpp"
 #include "IndexEntry.hpp"
 #include "rows.hpp"
-#include "Message.hpp"
+#include "Decoder.hpp"
 
 ink::error_t ink::FileSet::open(ink::path_t directory)
 {
@@ -45,14 +45,20 @@ ink::error_t ink::FileSet::open(ink::path_t directory)
 }
 
 
-ink::error_t ink::FileSet::receive(Message& message) {
+ink::error_t ink::FileSet::receive(Stretch message) {
     REQUIRE(opened);
-    auto& trxn_row = message.getTrxn();
-    std::cerr << "received: " << trxn_row.id_.to_string() << std::endl;
-    auto& story = trxn_row.story_;
-    auto new_muts = trxn_row.id_.get_muts();
+    MetaRow meta_row;
+    auto decoder = Decoder(message);
+    int rowsCount=0;
+    bigint msgType=0;
+    PROPAGATE(decoder.decode_message(msgType, rowsCount));
+    REQUIRE(rowsCount >= 1);
+    decoder.decode_meta(meta_row);
+    std::cerr << "received: " << meta_row.id_.to_string() << std::endl;
+    const auto & story = meta_row.story_;
+    auto new_muts = meta_row.id_.get_muts();
     auto& ref = cap_files[story];
-    off_t index_offset;
+    off_t index_offset=0;
     IndexEntry entry;
     if (ref.second) {
         index_offset = ref.first;
@@ -65,9 +71,10 @@ ink::error_t ink::FileSet::receive(Message& message) {
     } else {
         index_offset = ::lseek(index_fd_, 0, SEEK_END);
         ref.first = index_offset;
-        ref.second = std::make_unique<CapFile>(get_location(story));
+        ref.second = std::make_unique<CapFile>();
+        PROPAGATE(ref.second->open(get_location(story)));
     }
-    ref.second->receive(message);
+    PROPAGATE(ref.second->receive(message));
     entry.set_story(story);
     entry.set_value(new_muts);
     auto written = ::write(index_fd_, &entry, sizeof(entry));

@@ -3,10 +3,8 @@
 #include <map>
 #include "typedefs.hpp"
 #include "Id.hpp"
-#include "Message.hpp"
+#include "Decoder.hpp"
 #include "verify.hpp"
-
-#define MILLION 1'000'000
 
 
 namespace ink {
@@ -20,7 +18,7 @@ namespace ink {
     public:
         error_t open(path_t file_path);
 
-        error_t receive(Message&);
+        error_t receive(Stretch, muts_t muts);
 
         error_t goes_to(muts_t& out) const {
             REQUIRE(not index_.empty());
