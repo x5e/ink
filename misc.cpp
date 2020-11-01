@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include <sstream>
 #include "misc.hpp"
+#include "verify.hpp"
 
 #define HEX(x) char(x < 10 ? x + '0' : x + 'A' - 10)
 
@@ -28,11 +29,11 @@ TEST(misc, split) {
     EXPECT_EQ(out[2], "baz");
 }
 
-void ink::ensure_directory(const std::string &fn) {
+ink::error_t ink::ensure_directory(const std::string &fn) {
     std::string command = "mkdir -p " + fn;
     std::cerr << "running: " << command << std::endl;
     auto result = system(command.c_str());
-    VERIFY(result != -1);
+    REQUIRE(result != -1);
 }
 
 std::string ink::escapes(const std::string &from) {
@@ -42,6 +43,19 @@ std::string ink::escapes(const std::string &from) {
         stream << '\\' << 'x' << HEX(i / 16) << HEX(i % 16);
     }
     return stream.str();
+}
+
+bool ink::exists(const std::string &fn) {
+    using namespace std::string_literals;
+    std::string command = "/bin/test -e "s + fn;
+    auto result = system(command.c_str());
+    return (result == 0);
+}
+
+bool ink::touch(const std::string &fn) {
+    std::string command = std::string("touch ") + fn;
+    auto result = system(command.c_str());
+    return(result == 0);
 }
 
 TEST(misc, escapes) {

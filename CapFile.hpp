@@ -3,31 +3,27 @@
 #include <map>
 #include "typedefs.hpp"
 #include "Id.hpp"
-#include "decoder.hpp"
-#include "Message.hpp"
-
-#define MILLION 1'000'000
+#include "Decoder.hpp"
+#include "verify.hpp"
 
 
 namespace ink {
-    using path_t = std::string;
 
     class CapFile {
-        const path_t path_;
-        const int fd;
+        path_t path_;
+        int fd;
         off_t location;
         size_t max_packet_size = 0;
         std::map<muts_t, off_t> index_;
     public:
-        explicit CapFile(path_t file_path);
+        error_t open(path_t file_path);
 
-        void receive(const char*, size_t, muts_t);
+        error_t receive(Stretch, muts_t muts);
 
-        std::iterator<std::input_iterator_tag, Message> begin() { throw std::runtime_error(path_); }
-
-        muts_t goes_to() const {
-            VERIFY(not index_.empty());
-            return (--index_.end())->first;
+        error_t goes_to(muts_t& out) const {
+            REQUIRE(not index_.empty());
+            out = (--index_.end())->first;
+            return no_error;
         }
     };
 

@@ -9,19 +9,20 @@ namespace ink {
         char data_[2 + 16 + 1 + 8] = {};
     public:
         IndexEntry() {
-            VERIFY(sizeof(IndexEntry) == 2 + 16 + 1 + 8);
+            static_assert(sizeof(IndexEntry) == 2 + 16 + 1 + 8, "IndexEntry size problem");
             data_[0] = '\xd8';
             data_[1] = '\x01';
             data_[2 + 16] = '\xCF';
         }
 
-        void validate() {
-            VERIFY(data_[0] == '\xd8');
-            VERIFY(data_[1] == '\x01');
-            VERIFY(data_[2+16] == '\xCF');
+        error_t validate() {
+            REQUIRE(data_[0] == '\xd8');
+            REQUIRE(data_[1] == '\x01');
+            REQUIRE(data_[2 + 16] == '\xCF');
+            return no_error;
         }
 
-        void set_story(Muid story) {
+        void set_story(const Muid& story) {
             memcpy(&data_[2], story.data(), 16);
         }
 

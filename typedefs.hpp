@@ -1,6 +1,6 @@
 #pragma once
-
 #include <cstdint>
+#include <string>
 
 namespace ink {
     using guint32 = uint32_t;
@@ -25,8 +25,10 @@ namespace ink {
         guint32 orig_len;       /* actual length of packet */
     } pcaprec_hdr_t;
 
-    using muts_t = uint64_t;
-    using cstr_t = const char *;
-    using buff_t = char *;
-    using tag_t = uint64_t;
+    using bigint = int64_t;
+    using muts_t = bigint;
+    using tag_t = bigint;
+    using path_t = std::string;
+    using error_t = const char *;
+    error_t no_error = nullptr;
 }

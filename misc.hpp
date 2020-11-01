@@ -1,16 +1,14 @@
 #pragma once
 #include <string>
 #include <vector>
-#include <cstdlib>
-#include "verify.hpp"
-#include "Id.hpp"
-
+#include "typedefs.hpp"
 
 namespace ink {
-    using path_t = std::string;
     std::vector<std::string> split(const std::string &thing, const std::string &how);
-    void ensure_directory(const std::string &fn);
+    error_t ensure_directory(const std::string &fn);
     std::string escapes(const std::string& from);
+    bool exists(const std::string & fn);
+    bool touch(const std::string& fn);
 
 
     inline uint64_t flip64(uint64_t x) noexcept
@@ -28,20 +26,6 @@ namespace ink {
                   ((num>>8)&0xff00) | // move byte 2 to byte 1
                   ((num<<24)&0xff000000); // byte 0 to byte 3
         return swapped;
-    }
-
-
-    inline bool exists(const path_t & fn) {
-        using namespace std::string_literals;
-        std::string command = "/bin/test -e "s + fn;
-        auto result = system(command.c_str());
-        return (result == 0);
-    }
-
-    inline bool touch(const path_t& fn) {
-        std::string command = std::string("touch ") + fn;
-        auto result = system(command.c_str());
-        return(result == 0);
     }
 
 }

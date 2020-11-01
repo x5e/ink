@@ -1,25 +1,27 @@
 #pragma once
 #include "Id.hpp"
-#include "String.hpp"
+#include "Strings.hpp"
+#include <string>
+
 
 namespace ink {
 
     struct Row {
-        tag_t tag = {};
-        Muid id_ = {};
+        tag_t tag = 0;
+        Id id_ = {};
     };
 
-    struct TrxnRow : public Row {
+    struct MetaRow : public Row {
         static const tag_t Tag = 0x13;
-        Muid story = {};
-        Muid account = {};
-        Muid actor = {};
-        Uuid request = {};
-        muts_t follows = {};
-        String note = {};
-        void decode(cstr_t& ptr, uint32_t vals);
+        Id story_ = {};
+        Id account_ = {};
+        Id actor_ = {};
+        Id request_ = {};
+        muts_t follows_ = {};
+        Stretch note_ = {};
     };
 
+    /*
     struct PurgeRow: public Row {
         static const tag_t Tag = 0x15;
         Muid account = {};  // TODO references accounts
@@ -67,4 +69,5 @@ namespace ink {
         // null entry to indicate deletion of branch
         void parse(cstr_t &ptr, uint32_t vals);
     };
+     */
 }
