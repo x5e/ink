@@ -1,7 +1,7 @@
 #include <cassert>
-#include "Decoder.hpp"
-#include "misc.hpp"
-#include "verify.hpp"
+#include "../headers/Decoder.hpp"
+#include "../headers/misc.hpp"
+#include "../headers/verify.hpp"
 
 using Byte = char;
 

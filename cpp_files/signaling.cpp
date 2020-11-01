@@ -1,5 +1,5 @@
 #include <cstdio>
-#include "signaling.hpp"
+#include "../headers/signaling.hpp"
 
 sig_atomic_t ink::signaled = 0;
 

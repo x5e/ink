@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <sstream>
-#include "misc.hpp"
-#include "verify.hpp"
+#include "../headers/misc.hpp"
+#include "../headers/verify.hpp"
 
 #define HEX(x) char(x < 10 ? x + '0' : x + 'A' - 10)
 

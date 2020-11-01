@@ -2,9 +2,9 @@
 #include <utility>
 #include <fcntl.h>
 #include <unistd.h>
-#include "CapFile.hpp"
-#include "Decoder.hpp"
-#include "misc.hpp"
+#include "../headers/CapFile.hpp"
+#include "../headers/Decoder.hpp"
+#include "../headers/misc.hpp"
 
 #define MILLION 1'000'000
 

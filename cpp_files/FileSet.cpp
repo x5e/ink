@@ -1,11 +1,11 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <cstring>
-#include "FileSet.hpp"
-#include "misc.hpp"
-#include "IndexEntry.hpp"
-#include "rows.hpp"
-#include "Decoder.hpp"
+#include "../headers/FileSet.hpp"
+#include "../headers/misc.hpp"
+#include "../headers/IndexEntry.hpp"
+#include "../headers/rows.hpp"
+#include "../headers/Decoder.hpp"
 
 ink::error_t ink::FileSet::open(ink::path_t directory)
 {

@@ -1,11 +1,12 @@
+#ifdef IGNORE
 #define ASIO_STANDALONE 1
 #include <websocketpp/config/asio_no_tls_client.hpp>
 #include <websocketpp/client.hpp>
 #include <iostream>
-#include "CapFile.hpp"
-#include "FileSet.hpp"
-#include "verify.hpp"
-#include "Decoder.hpp"
+#include "../headers/CapFile.hpp"
+#include "../headers/FileSet.hpp"
+#include "../headers/verify.hpp"
+#include "../headers/Decoder.hpp"
 
 typedef websocketpp::client<websocketpp::config::asio_client> Client;
 
@@ -81,3 +82,4 @@ void client_main(const std::string& uri = "ws://localhost:9002") {
         std::cerr << e.what() << std::endl;
     }
 }
+#endif

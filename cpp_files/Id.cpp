@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
-#include "Id.hpp"
-#include "verify.hpp"
+#include "../headers/Id.hpp"
+#include "../headers/verify.hpp"
 
 void ink::Id::parse(const std::string &hex_str) {
     size_t j = 0;

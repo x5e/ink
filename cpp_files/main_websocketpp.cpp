@@ -1,3 +1,4 @@
+#ifdef IGNORE
 #define ASIO_STANDALONE 1
 #include <websocketpp/config/asio_no_tls.hpp>
 
@@ -65,3 +66,4 @@ int main_websocketpp() {
 }
 
 // websocat ws://localhost:9002/
+#endif
